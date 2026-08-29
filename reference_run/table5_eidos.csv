@@ -1,0 +1,4 @@
+case,generator,noise_sigma,seed,truth_formula,eidos_formula,selected_candidate_id,semantic_nrmse
+Oscillator,oscillator,0.8,20260225,2.2\sin(1.1x_1)+0.8\cos(x_2)-0.2x_3,-0.07955 + 2.209\sin(1.1x_1) + 0.9181\cos(x_2) - 0.2409x_3,cand_0454,0.08322072567853776
+Lorentz,lorentz,0.8,20260225,\frac{x_1x_2}{1+x_3^2},-0.04502 + 1.002\frac{x_1x_2}{1+x_3^2},cand_0446,0.03847661601467216
+Blackbody proxy,blackbody,0.8,20260225,"\frac{x_1^3}{\exp(\operatorname{clip}(x_2,0,5))-1+0.01}+0.05x_3","-0.08285 + 1.004\frac{x_1^3}{\exp(\operatorname{clip}(x_2,0,5))-1+0.01} + 0.007279x_3",cand_0596,0.005397846227991727

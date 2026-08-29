@@ -1,0 +1,19 @@
+{
+  "python": "3.12.0 (tags/v3.12.0:0fb18b0, Oct  2 2023, 13:03:39) [MSC v.1935 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.22635-SP0",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "2.3.3",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.8.0",
+    "PyYAML": "6.0.3"
+  },
+  "noise_sigma": 0.8,
+  "registered_seeds": [
+    20260225,
+    20260226,
+    20260227,
+    20260228,
+    20260229
+  ]
+}

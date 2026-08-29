@@ -1,0 +1,2 @@
+This reproduction archive does not declare a software or data licence.
+The authors should add the intended licence before public distribution.

@@ -1,0 +1,30 @@
+[project]
+name = "eidos-eswa-table5-reproduction"
+version = "1.0.0"
+description = "Independent EIDOS reproduction for the representative equation records in Table 5"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "numpy==2.4.6",
+  "pandas==2.3.3",
+  "scipy==1.17.1",
+  "scikit-learn==1.8.0",
+  "PyYAML==6.0.3",
+]
+
+[project.scripts]
+eidos-reproduce-table5 = "reproduce:main"
+
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["reproduce", "table5_experiment"]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src", "src.*", "reference"]
+
+[tool.setuptools.package-data]
+reference = ["*.csv", "README.md"]
