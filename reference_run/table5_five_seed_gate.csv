@@ -1,4 +1,0 @@
-case,generator,recovered,registered_runs,semantic_nrmse_mean,semantic_nrmse_max,gate
-Oscillator,oscillator,5,5,0.07302996323667119,0.08322072567853776,5/5
-Lorentz,lorentz,5,5,0.04415999884537329,0.07224603039453945,5/5
-Blackbody proxy,blackbody,5,5,0.0036539519088407838,0.005397846227991727,5/5

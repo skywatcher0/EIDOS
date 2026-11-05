@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+results/
+results_*/
+rebuilt_data/
+container_results/

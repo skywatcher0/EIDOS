@@ -1,0 +1,16 @@
+{
+  "blas_threads_per_worker": 1,
+  "packages": {
+    "PyYAML": "6.0.3",
+    "matplotlib": "3.10.8",
+    "numpy": "2.4.2",
+    "pandas": "3.0.1",
+    "scikit-learn": "1.8.0",
+    "scipy": "1.17.1"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.12 (main, Feb  3 2026, 22:54:57) [MSC v.1944 64 bit (AMD64)]",
+  "source_config_sha256": "4b08f354f9d19fead87ab2c1968884ec235f7d45326d3e6e00f825f895856c76",
+  "suite": "all",
+  "workers": 8
+}

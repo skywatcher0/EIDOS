@@ -1,0 +1,147 @@
+[
+  {
+    "file": "src/eidos/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/dsl/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/dsl/grammar.py",
+    "sha256": "a353551d72af502011cfc4016bfe7d6ef7a8c1b669aaddd66f02ceb397b44fbc",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/dsl/types_units.py",
+    "sha256": "b40e10b59d3e298f33e7fb97ad41fc429ddc20a5bddf5244f71fe34512fde119",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/dsl/domain_safety.py",
+    "sha256": "c27ca7e3ba53df511950e6387ab0860190b991af87cb551ec45a2e062a7fe97a",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/canon/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/canon/syn.py",
+    "sha256": "901db88af466d06815382a73a6bdf4292bea222daa7d60a02aa409ff9b680a94",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/canon/semhash.py",
+    "sha256": "22269c1200ac803945a8698899824739ed49279fdfdba4f070407e1d295d23df",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/mdl/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/mdl/total.py",
+    "sha256": "6e6e7f4227fe9d7ea5520953deebc5dcf8fc595091a79fa3069cde587e720abe",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/mdl/fisher_code.py",
+    "sha256": "59e6a746a1b69bf635d702296e47106c048a2e63b0ea76dc1d2373218c27efe7",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/mdl/data_code.py",
+    "sha256": "93d4d6f430c992d8e3de9d8fb912d6e28d807c8e468f1f11b271544e603a1cf9",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/mdl/struct_code.py",
+    "sha256": "2348fcdc58704c2e8506be36cc3f5a3c20831fc3962a7e404fd2bd9e6535f32e",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/mdl/param_code.py",
+    "sha256": "f32097fb5072d953e2429f940ad4d6765b3d598520b487126626b7703fb9e2a5",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/invariance/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/invariance/crossfit.py",
+    "sha256": "477bc436a538feea1aae051a2efc7ab323341480387e94cde13d5b212a2926fa",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/invariance/mmd_rff.py",
+    "sha256": "616e75ec9b3fb92446f176f30bbb579ada88a521140f0cefad6cf8ab1465d14f",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/invariance/hsic.py",
+    "sha256": "75cfe308ded191023c0d70b4a5280a711721af8f02df72c6303ecf71f9933aee",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/invariance/permutation.py",
+    "sha256": "49cb8c736ac03188af510c56dd1ca0f93016c3c1f5fa20c1752e138667c5b497",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/invariance/residual_normalization.py",
+    "sha256": "bc616ba5d85f9dbf51ee4935013b3cb43a264cd8a17fdbbe401e791f76deec39",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/conformal/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/conformal/split_cp.py",
+    "sha256": "0553da8cdf11f263c25936818782b79abccabb37f12a802c5bacfd547a39e43b",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/conformal/weighted_cp.py",
+    "sha256": "0562f63207df873cf2d189971c99d07160baad018251b71b08dd90314035ff69",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/search/engine.py",
+    "sha256": "2805a03151fc0e5785479029e491c96855a6bd2ccbcd9a1ae96e6fa6be618595",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/search/models.py",
+    "sha256": "8b2815cc88a3c5b43ec409c3befa5cec94185837fd9f480d1f182c4cd66138ae",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/protocol/__init__.py",
+    "sha256": "d0593d8bf040d61dc73bf2ddaa8a17c86510e8c61ca096a6846a297f503341e1",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/protocol/strict.py",
+    "sha256": "4e0e81aaf71d5d6cfa821557a835546d2476bdc958a88e962a1b70e75483cc78",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/evaluation/__init__.py",
+    "sha256": "0ee08a9cb55d91bafb614eb75fe09ace72a7ecc9046d78898efcd50eb86cf376",
+    "change": "none"
+  },
+  {
+    "file": "src/eidos/evaluation/recovery.py",
+    "sha256": "4bf8c8c96b78907152998d3cf83a5439184cc0cbf100117a2fbb929297f3a760",
+    "change": "none"
+  }
+]

@@ -1,0 +1,94 @@
+{
+  "benchmark": [
+    {
+      "benchmark_role": "auxiliary_tabular",
+      "median_basis_terms": 3.0,
+      "median_rmse": 0.7501444450743289,
+      "median_runtime_sec": 0.8937129001133144,
+      "replacement_passes": 1,
+      "tasks": 1
+    },
+    {
+      "benchmark_role": "mechanism_or_synthetic",
+      "median_basis_terms": 39.0,
+      "median_rmse": 0.0002773812825698,
+      "median_runtime_sec": 0.6063990998081863,
+      "replacement_passes": 1,
+      "tasks": 1
+    }
+  ],
+  "conformal": [
+    {
+      "arm": "exchangeable",
+      "coverage": 0.936842105263158,
+      "mean_width": 18.20421492088948,
+      "method": "mondrian",
+      "runs": 1
+    },
+    {
+      "arm": "exchangeable",
+      "coverage": 0.9087719298245616,
+      "mean_width": 17.003746548151373,
+      "method": "split",
+      "runs": 1
+    },
+    {
+      "arm": "shifted",
+      "coverage": 0.8421052631578947,
+      "mean_width": 19.27711740957497,
+      "method": "mondrian",
+      "runs": 1
+    },
+    {
+      "arm": "shifted",
+      "coverage": 0.9710526315789474,
+      "mean_width": 41.76993980860341,
+      "method": "proxy_trend",
+      "runs": 1
+    },
+    {
+      "arm": "shifted",
+      "coverage": 0.7973684210526316,
+      "mean_width": 16.082854107134295,
+      "method": "split",
+      "runs": 1
+    }
+  ],
+  "openml": [
+    {
+      "dataset": "yacht_hydrodynamics",
+      "mean_rmse": 0.1087385260464265,
+      "median_rmse": 0.1087385260464265,
+      "runs": 1
+    }
+  ],
+  "recovery": [
+    {
+      "generator": "blackbody",
+      "noise_sigma": 0.8,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 1,
+      "semantic_nrmse": 0.0053978462279917
+    },
+    {
+      "generator": "lorentz",
+      "noise_sigma": 0.8,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 1,
+      "semantic_nrmse": 0.0384766160146721
+    },
+    {
+      "generator": "oscillator",
+      "noise_sigma": 0.8,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 1,
+      "semantic_nrmse": 0.0832207256785377
+    }
+  ]
+}

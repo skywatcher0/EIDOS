@@ -1,2 +1,10 @@
-This reproduction archive does not declare a software or data licence.
-The authors should add the intended licence before public distribution.
+The supplied EIDOS project did not declare a software licence. This archive
+does not invent or change the authors' licensing terms.
+
+Public datasets retain their original rights and attribution. PMLB source
+URLs and archived checksums are in data/pmlb/manifest.json; OpenML dataset IDs,
+source URLs, target columns and preprocessing are in data/openml/. Original
+dataset metadata and the upstream PMLB licence are retained where available.
+
+The included paper text is supplied only as the provenance for this requested
+reproduction package. It is not a new manuscript release.

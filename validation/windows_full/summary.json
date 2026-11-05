@@ -1,0 +1,511 @@
+{
+  "benchmark": [
+    {
+      "benchmark_role": "auxiliary_tabular",
+      "median_basis_terms": 9.0,
+      "median_rmse": 0.6349560503330929,
+      "median_runtime_sec": 2.4504902998451144,
+      "replacement_passes": 43,
+      "tasks": 43
+    },
+    {
+      "benchmark_role": "mechanism_or_synthetic",
+      "median_basis_terms": 18.0,
+      "median_rmse": 0.15962946439829084,
+      "median_runtime_sec": 2.342948249890469,
+      "replacement_passes": 200,
+      "tasks": 200
+    }
+  ],
+  "conformal": [
+    {
+      "arm": "exchangeable",
+      "coverage": 0.9146666666666667,
+      "mean_width": 5.347815145613688,
+      "method": "mondrian",
+      "runs": 25
+    },
+    {
+      "arm": "exchangeable",
+      "coverage": 0.9054035087719298,
+      "mean_width": 4.622020837769918,
+      "method": "split",
+      "runs": 25
+    },
+    {
+      "arm": "shifted",
+      "coverage": 0.8407368421052631,
+      "mean_width": 5.249741045471386,
+      "method": "mondrian",
+      "runs": 25
+    },
+    {
+      "arm": "shifted",
+      "coverage": 0.9421052631578948,
+      "mean_width": 8.845506969869195,
+      "method": "proxy_trend",
+      "runs": 25
+    },
+    {
+      "arm": "shifted",
+      "coverage": 0.7281052631578947,
+      "mean_width": 3.627138048991239,
+      "method": "split",
+      "runs": 25
+    }
+  ],
+  "openml": [
+    {
+      "dataset": "abalone",
+      "mean_rmse": 0.5990039916388946,
+      "median_rmse": 0.6056005581413892,
+      "runs": 10
+    },
+    {
+      "dataset": "airfoil_self_noise",
+      "mean_rmse": 0.629272733106586,
+      "median_rmse": 0.6286030115619187,
+      "runs": 10
+    },
+    {
+      "dataset": "california_housing",
+      "mean_rmse": 0.569841951368229,
+      "median_rmse": 0.5764979600845836,
+      "runs": 10
+    },
+    {
+      "dataset": "concrete_strength",
+      "mean_rmse": 0.4532483499827903,
+      "median_rmse": 0.4321410658902194,
+      "runs": 10
+    },
+    {
+      "dataset": "energy_efficiency_heating",
+      "mean_rmse": 0.061385845750411325,
+      "median_rmse": 0.06105611321127295,
+      "runs": 10
+    },
+    {
+      "dataset": "grid_stability",
+      "mean_rmse": 0.5098271142038975,
+      "median_rmse": 0.5129930448252247,
+      "runs": 10
+    },
+    {
+      "dataset": "kin8nm",
+      "mean_rmse": 0.7776037783546823,
+      "median_rmse": 0.7949933502484249,
+      "runs": 10
+    },
+    {
+      "dataset": "naval_propulsion_compressor",
+      "mean_rmse": 0.20630377131598396,
+      "median_rmse": 0.1249727529178874,
+      "runs": 10
+    },
+    {
+      "dataset": "protein_physicochemical",
+      "mean_rmse": 0.9257575290858344,
+      "median_rmse": 0.9193334470031131,
+      "runs": 10
+    },
+    {
+      "dataset": "pumadyn32nh",
+      "mean_rmse": 0.9621666398787957,
+      "median_rmse": 0.9808896869495054,
+      "runs": 10
+    },
+    {
+      "dataset": "qsar_fish_toxicity",
+      "mean_rmse": 0.6912074866731194,
+      "median_rmse": 0.6821643529192307,
+      "runs": 10
+    },
+    {
+      "dataset": "space_ga",
+      "mean_rmse": 0.6344415174222963,
+      "median_rmse": 0.6435284459752981,
+      "runs": 10
+    },
+    {
+      "dataset": "superconductivity",
+      "mean_rmse": 0.5939566930109118,
+      "median_rmse": 0.5775216577511665,
+      "runs": 10
+    },
+    {
+      "dataset": "wine_quality",
+      "mean_rmse": 0.8856730719755964,
+      "median_rmse": 0.8660044007091385,
+      "runs": 10
+    },
+    {
+      "dataset": "yacht_hydrodynamics",
+      "mean_rmse": 0.08937840509202319,
+      "median_rmse": 0.0769032718010919,
+      "runs": 10
+    }
+  ],
+  "recovery": [
+    {
+      "generator": "blackbody",
+      "noise_sigma": 0.01,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 5.095003786653218e-05
+    },
+    {
+      "generator": "blackbody",
+      "noise_sigma": 0.05,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.00022666696295648342
+    },
+    {
+      "generator": "blackbody",
+      "noise_sigma": 0.1,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.00045153461609546004
+    },
+    {
+      "generator": "blackbody",
+      "noise_sigma": 0.2,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.00090597692044414
+    },
+    {
+      "generator": "blackbody",
+      "noise_sigma": 0.4,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.00182920600272194
+    },
+    {
+      "generator": "blackbody",
+      "noise_sigma": 0.8,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.0036539519088407196
+    },
+    {
+      "generator": "blackbody",
+      "noise_sigma": 1.6,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.007318098796562521
+    },
+    {
+      "generator": "blackbody",
+      "noise_sigma": 3.2,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.014637875237159221
+    },
+    {
+      "generator": "kepler",
+      "noise_sigma": 0.01,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.00047348035445913996
+    },
+    {
+      "generator": "kepler",
+      "noise_sigma": 0.05,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.0019340840192444999
+    },
+    {
+      "generator": "kepler",
+      "noise_sigma": 0.1,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.00391573612677694
+    },
+    {
+      "generator": "kepler",
+      "noise_sigma": 0.2,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.00780717472763736
+    },
+    {
+      "generator": "kepler",
+      "noise_sigma": 0.4,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.015654372323807057
+    },
+    {
+      "generator": "kepler",
+      "noise_sigma": 0.8,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.031303177401915364
+    },
+    {
+      "generator": "kepler",
+      "noise_sigma": 1.6,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 0.8,
+      "runs": 5,
+      "semantic_nrmse": 0.07348443099838711
+    },
+    {
+      "generator": "kepler",
+      "noise_sigma": 3.2,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 0.2,
+      "runs": 5,
+      "semantic_nrmse": 0.1897656663434527
+    },
+    {
+      "generator": "lorentz",
+      "noise_sigma": 0.01,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.00068950801698248
+    },
+    {
+      "generator": "lorentz",
+      "noise_sigma": 0.05,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.0026658194608103003
+    },
+    {
+      "generator": "lorentz",
+      "noise_sigma": 0.1,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.0055692233783872
+    },
+    {
+      "generator": "lorentz",
+      "noise_sigma": 0.2,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.01104668058872314
+    },
+    {
+      "generator": "lorentz",
+      "noise_sigma": 0.4,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.022119922573013318
+    },
+    {
+      "generator": "lorentz",
+      "noise_sigma": 0.8,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.044159998845373236
+    },
+    {
+      "generator": "lorentz",
+      "noise_sigma": 1.6,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 0.8,
+      "runs": 5,
+      "semantic_nrmse": 0.1111471132245007
+    },
+    {
+      "generator": "lorentz",
+      "noise_sigma": 3.2,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 0.6,
+      "runs": 5,
+      "semantic_nrmse": 0.2016488519985665
+    },
+    {
+      "generator": "oscillator",
+      "noise_sigma": 0.01,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.00123247301046992
+    },
+    {
+      "generator": "oscillator",
+      "noise_sigma": 0.05,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.004473245365178321
+    },
+    {
+      "generator": "oscillator",
+      "noise_sigma": 0.1,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.009196662170248001
+    },
+    {
+      "generator": "oscillator",
+      "noise_sigma": 0.2,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.01832424770291952
+    },
+    {
+      "generator": "oscillator",
+      "noise_sigma": 0.4,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.03669764808272592
+    },
+    {
+      "generator": "oscillator",
+      "noise_sigma": 0.8,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.07302996323667113
+    },
+    {
+      "generator": "oscillator",
+      "noise_sigma": 1.6,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 0.8,
+      "runs": 5,
+      "semantic_nrmse": 0.1524430557699605
+    },
+    {
+      "generator": "oscillator",
+      "noise_sigma": 3.2,
+      "operator_precision": 1.0,
+      "operator_recall": 0.6666666666666666,
+      "recovery_rate": 0.0,
+      "runs": 5,
+      "semantic_nrmse": 0.39459812098284014
+    },
+    {
+      "generator": "relativistic",
+      "noise_sigma": 0.01,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.00099563653045684
+    },
+    {
+      "generator": "relativistic",
+      "noise_sigma": 0.05,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.0040926291043602795
+    },
+    {
+      "generator": "relativistic",
+      "noise_sigma": 0.1,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.00754191940629894
+    },
+    {
+      "generator": "relativistic",
+      "noise_sigma": 0.2,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.015192168806222182
+    },
+    {
+      "generator": "relativistic",
+      "noise_sigma": 0.4,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.03009548753066374
+    },
+    {
+      "generator": "relativistic",
+      "noise_sigma": 0.8,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 1.0,
+      "runs": 5,
+      "semantic_nrmse": 0.060022819031904706
+    },
+    {
+      "generator": "relativistic",
+      "noise_sigma": 1.6,
+      "operator_precision": 1.0,
+      "operator_recall": 1.0,
+      "recovery_rate": 0.4,
+      "runs": 5,
+      "semantic_nrmse": 0.2727552176881721
+    },
+    {
+      "generator": "relativistic",
+      "noise_sigma": 3.2,
+      "operator_precision": 0.9,
+      "operator_recall": 0.95,
+      "recovery_rate": 0.4,
+      "runs": 5,
+      "semantic_nrmse": 0.35617015272612007
+    }
+  ]
+}

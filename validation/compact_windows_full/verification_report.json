@@ -1,0 +1,251 @@
+{
+  "checks": [
+    {
+      "check": "successful_rows",
+      "failures": 0,
+      "passed": true,
+      "rows": 243,
+      "suite": "benchmark"
+    },
+    {
+      "check": "reference_keys",
+      "passed": true,
+      "suite": "benchmark"
+    },
+    {
+      "actual": 243,
+      "check": "full_grid",
+      "expected": 243,
+      "passed": true,
+      "suite": "benchmark"
+    },
+    {
+      "atol": 1e-05,
+      "check": "rmse",
+      "matched": 243,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 243,
+      "strict_passed": true,
+      "suite": "benchmark",
+      "total": 243
+    },
+    {
+      "atol": 1e-08,
+      "check": "coverage",
+      "matched": 243,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 243,
+      "strict_passed": true,
+      "suite": "benchmark",
+      "total": 243
+    },
+    {
+      "atol": 1e-05,
+      "check": "interval_length",
+      "matched": 243,
+      "max_abs_difference": 4.440892098500626e-16,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 243,
+      "strict_passed": true,
+      "suite": "benchmark",
+      "total": 243
+    },
+    {
+      "atol": 1e-08,
+      "check": "p_inv_lock",
+      "matched": 243,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 243,
+      "strict_passed": true,
+      "suite": "benchmark",
+      "total": 243
+    },
+    {
+      "check": "candidate_id",
+      "matched": 243,
+      "passed": true,
+      "suite": "benchmark",
+      "total": 243
+    },
+    {
+      "check": "record_prediction_roundtrip",
+      "passed": true,
+      "suite": "benchmark"
+    },
+    {
+      "check": "replacement_invariance",
+      "passed": true,
+      "passed_tasks": 243,
+      "suite": "benchmark",
+      "tasks": 243
+    },
+    {
+      "check": "successful_rows",
+      "failures": 0,
+      "passed": true,
+      "rows": 150,
+      "suite": "openml"
+    },
+    {
+      "check": "reference_keys",
+      "passed": true,
+      "suite": "openml"
+    },
+    {
+      "actual": 150,
+      "check": "full_grid",
+      "expected": 150,
+      "passed": true,
+      "suite": "openml"
+    },
+    {
+      "atol": 1e-08,
+      "check": "rmse",
+      "matched": 150,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 150,
+      "strict_passed": true,
+      "suite": "openml",
+      "total": 150
+    },
+    {
+      "check": "record_prediction_roundtrip",
+      "passed": true,
+      "suite": "openml"
+    },
+    {
+      "check": "successful_rows",
+      "failures": 0,
+      "passed": true,
+      "rows": 200,
+      "suite": "recovery"
+    },
+    {
+      "check": "reference_keys",
+      "passed": true,
+      "suite": "recovery"
+    },
+    {
+      "actual": 200,
+      "check": "full_grid",
+      "expected": 200,
+      "passed": true,
+      "suite": "recovery"
+    },
+    {
+      "atol": 1e-08,
+      "check": "semantic_nrmse",
+      "matched": 200,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 200,
+      "strict_passed": true,
+      "suite": "recovery",
+      "total": 200
+    },
+    {
+      "atol": 1e-08,
+      "check": "rmse_test",
+      "matched": 200,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 200,
+      "strict_passed": true,
+      "suite": "recovery",
+      "total": 200
+    },
+    {
+      "check": "selected_candidate_id",
+      "matched": 200,
+      "passed": true,
+      "suite": "recovery",
+      "total": 200
+    },
+    {
+      "check": "recovered",
+      "matched": 200,
+      "passed": true,
+      "suite": "recovery",
+      "total": 200
+    },
+    {
+      "check": "record_prediction_roundtrip",
+      "passed": true,
+      "suite": "recovery"
+    },
+    {
+      "check": "successful_rows",
+      "failures": 0,
+      "passed": true,
+      "rows": 125,
+      "suite": "conformal"
+    },
+    {
+      "check": "reference_keys",
+      "passed": true,
+      "suite": "conformal"
+    },
+    {
+      "actual": 125,
+      "check": "full_grid",
+      "expected": 125,
+      "passed": true,
+      "suite": "conformal"
+    },
+    {
+      "atol": 1e-08,
+      "check": "observed_coverage",
+      "matched": 125,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 125,
+      "strict_passed": true,
+      "suite": "conformal",
+      "total": 125
+    },
+    {
+      "atol": 1e-08,
+      "check": "mean_interval_length",
+      "matched": 125,
+      "max_abs_difference": 9.237055564881302e-14,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 125,
+      "strict_passed": true,
+      "suite": "conformal",
+      "total": 125
+    },
+    {
+      "check": "selected_candidate_id",
+      "matched": 125,
+      "passed": true,
+      "suite": "conformal",
+      "total": 125
+    }
+  ],
+  "note": "Timing is excluded. Smoke checks only selected cells. PMLB RMSE/width allow 1% of the 0.001 response bin (atol=1e-5); strict atol=1e-8 matches and differences remain visible. Other metrics retain atol=1e-8.",
+  "passed": true,
+  "scope": "all",
+  "source_config_sha256": "e4e5342d2e57069c7ccaad4983cd3c306ef52b856356ad34f8035b042e0071d6"
+}

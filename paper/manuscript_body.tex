@@ -1,0 +1,568 @@
+\section{Introduction}\label{sec:introduction}
+
+Expert systems increasingly acquire their rules through machine discovery rather than manual elicitation. Symbolic regression (SR) is the most direct instance: it yields a closed-form expression that a knowledge base can store, show to a domain specialist, execute in a decision rule, and cite as the basis for a recommendation \citep{schmidt2009,brunton2016,udrescu2020aifeynman,kramer2026automated}, with recent applications such as interpretable clinical decision scores \citep{aldeia2026clinical}.
+
+Admitting a discovered equation into a curated knowledge base imposes requirements that a low held-out root-mean-square error (RMSE) cannot discharge. Consider an archived entry with coefficients rounded to three significant figures, a held-out RMSE, and a note that residuals were modelled as Gaussian. Recomputing the selection score from the disclosed coefficients gives a different value, because ranking used full-precision values, and the archived description length is irreproducible, because the standardisation statistics were omitted and the Gaussian density lacks a declared reference measure and recording resolution. We call this failure \emph{representation leakage}: information that affects scores or predictions enters selection without being transmitted in the record or fixed in advance.
+
+A second, orthogonal failure, \emph{evidence leakage}, concerns which data shaped the admitted entry. Candidate generation, tuning, residual diagnostics, and interval calibration all touch data, and unrestricted holdout reuse invalidates post-selection guarantees \citep{berk2013postselection,dwork2015holdout}. A cross-disciplinary survey found such leakage in 294 published studies \citep{kapoor2023leakage}, and SR pipelines are particularly exposed because interpretable hypothesis spaces invite revision after inspection of validation residuals. Neither failure implies the other: an isolated test split does not make truncated coefficients reconstructible, and an exact encoding does not stop selection from reading the calibration set. An admission pipeline must therefore make the admitted object \emph{identifiable}, that is, the scored and reported predictor must be exactly reconstructible from its archived finite record and declared conventions, given the construction covariates (an archival property, distinct from statistical identifiability), and its evidence \emph{traceable}, that is, its data dependencies must be recorded in a canonical form that an independent maintainer can falsify by execution.
+
+These requirements correspond to a \emph{reproducible build} \citep{lamb2022reproducible} and to \emph{non-interference} \citep{goguen1982noninterference,sabelfeld2003ifc}, which can be checked by a \emph{metamorphic test} \citep{chen2018metamorphic}: rerunning a deterministic pipeline under admissible transformations of its restricted inputs and asserting output invariance (Section~\ref{sec:paradigms}). Held-out evaluation cannot replace these checks, because isolation is a property of the construction \emph{map}, whereas a predictive metric observes only a scalar summary of its \emph{output} on noisy holdout data; verifiability must be built into the admission architecture rather than inferred from predictive scores \citep{cornelio2026verification}.
+
+We operationalise these principles in \emph{Evidence-Isolated Discovery with Ontology-guided Screening} (EIDOS). Under a frozen, versioned context that serves as an operational task ontology, EIDOS partitions observations into five disjoint roles (discovery, diagnosis, verification, calibration, and test), encodes every candidate and refitted model as a prefix-decodable record with integer grid parameters and a normalised mass over discretised responses, and selects by cross-fit error with the codelength as tie-break. Because construction is deterministic given the frozen context and the construction roles, isolation becomes executable: rerunning construction with later-role data replaced by independent admissible draws and comparing the canonical payload byte for byte raises no false alarm on a compliant pipeline, and committing the score ledger (the selection key of every candidate) lets a single rerun expose calibration-dependent selection that held-out error barely registers. EIDOS combines an exact, representation-complete archival code with an executable non-interference test. Our contributions are threefold:
+\begin{enumerate}
+\item \textbf{A verification specification for equation admission} that defines representation- and evidence-channel validity, relates them to reproducible builds, non-interference, and metamorphic testing, and assesses common SR reporting practices against them (Sections~\ref{sec:paradigms} and~\ref{sec:positioning}).
+\item \textbf{The EIDOS architecture} (Section~\ref{sec:eidos}), which couples a representation-complete conditional code with a five-role isolation protocol and comes with proofs of exact reconstructibility, a conditional joint Kraft inequality, and, for byte-level replacement testing, zero false alarms under compliance, geometric miss decay, dominance over every admission-statistic detector, and collision-mass characterisation of ledger-recorded selection leakage (Section~\ref{sec:formal} and Appendix~\ref{app:theory}).
+\item \textbf{An evaluation separating predictive and evidential performance} (Sections~\ref{sec:experiments} and~\ref{sec:results}): EIDOS attains the best mean rank on 194 jointly completed mechanism-track tasks against eleven symbolic, tree-ensemble, neural, and linear comparators and records an EIDOS/LightGBM ratio of 0.960 on OpenML (not significantly different from one), and its ledger detects every injected calibration-dependent selection in one rerun with no false alarm in 4{,}881 negative-control reruns, whereas held-out RMSE misses graded leakage and rewards maximal leakage.
+\end{enumerate}
+Section~\ref{sec:related} reviews related work, Section~\ref{sec:positioning} states the specification, Section~\ref{sec:eidos} presents EIDOS, Sections~\ref{sec:experiments} and~\ref{sec:results} report the evaluation, and Section~\ref{sec:discussion} concludes.
+
+\section{Related work}\label{sec:related}
+
+\subsection{Equation discovery and symbolic-regression search}
+
+Genetic programming \citep{koza1992} underlies gplearn, Operon, and PySR \citep{stephens2015gplearn,burlacu2020operon,cranmer2023pysr}. Exhaustive and parallel enumeration make the hypothesis space explicit \citep{bartlett2024exhaustive,ruan2026pse}. Neural methods guide search with policy gradients or pretrained description-length estimators \citep{petersen2020dsr,yu2025mdlformer}, generate expressions end to end with pretrained transformers \citep{kamienny2022e2e}, or use large language models to propose equation programs \citep{shojaee2025llmsr}. Deterministic basis-expansion methods such as SINDy, FFX, and SISSO fit sparse combinations of enumerated nonlinear features \citep{brunton2016,mcconaghy2011ffx,ouyang2018sisso}; the bounded candidate bank and sparse-union refit of EIDOS belong to this family. Other work exploits dimensional analysis and physical symmetries \citep{udrescu2020aifeynman,tenachi2023physo} or studies benchmarks and the statistical limits of recovery from noisy samples \citep{olson2017pmlb,lacava2021srbench,fajardofontiveros2023limits}. Gradient-boosted trees and random forests remain leading tabular baselines \citep{breiman2001rf,chen2016xgboost,ke2017lightgbm} and do not target compact symbolic expressions; EIDOS specifies a self-contained archival encoding that guarantees exact reconstruction of the scored object.
+
+\subsection{Description-length and Bayesian selection over expression spaces}
+
+The minimum-description-length (MDL) principle compares hypotheses through codelengths that are valid only for uniquely decodable or Kraft-normalised codes \citep{rissanen1978,grunwald2007mdl}. MDL-guided SR \citep{bartlett2024exhaustive,yu2025mdlformer} and the Bayesian machine scientist \citep{guimera2020bms} balance accuracy and parsimony through complexity penalties or expression priors, and recent MDL formulations account for parameter count and Fisher-information precision \citep{bartlett2024exhaustive}. Exact archival reproducibility additionally requires that the parameter grid, the response reference measure and bin resolution, and the full decoder state be transmitted or fixed in advance (Section~\ref{sec:positioning}). EIDOS therefore builds an exact, Kraft-valid joint code while keeping cross-fit selection error as the primary selection key; candidate stacking \citep{breiman1996stacked} and lasso-selected sparse refitting \citep{tibshirani1996lasso} stay within the construction roles, so refitted models remain decodable records.
+
+\subsection{Data leakage, adaptive analysis, and post-selection inference}
+
+Leakage across training, validation, and evaluation splits is a pervasive source of irreproducible findings in machine-learning-based science \citep{kapoor2023leakage}. Reusable holdouts bound the risk of adaptive queries \citep{dwork2015holdout}, post-selection inference widens intervals so that they remain valid after model selection \citep{berk2013postselection}, and split-conformal prediction provides finite-sample coverage under exchangeability, with extensions to bounded departures from exchangeability \citep{lei2018conformal,barber2023exchangeability}. These frameworks bound or correct the \emph{downstream consequences} of data reuse; knowledge-base ingestion additionally requires an upstream, falsifiable record of \emph{which observations could have influenced the admitted equation}.
+
+\subsection{Verification of knowledge-based systems, documentation, and provenance}
+
+Verification and validation of expert systems has long recognised that accuracy on test cases does not establish structural integrity or rule consistency \citep{okeefe1993vv}. Model cards \citep{mitchell2019modelcards}, the W3C PROV-DM provenance model \citep{moreau2013provdm}, and machine-learning experiment trackers support documentation, provenance, or reproducible model packaging but do not specify the ingestion contract that a discovered equation requires: a score-to-decoder identity, under which every selection score is evaluated on the exact finite record reconstructed by the decoder, and an executable test that later data roles never influenced construction. EIDOS supplies this layer, also for external generators whose expressions are parsed into the frozen grammar and projected onto the parameter grid (Section~\ref{sec:representationchecks}).
+
+\subsection{Non-interference, reproducible builds, and metamorphic testing}\label{sec:paradigms}
+
+A system satisfies \emph{non-interference} when variations in its restricted (high) inputs cannot alter its observable (low) outputs \citep{goguen1982noninterference}. Treating the verification, calibration, and test observations as high inputs and the canonical construction payload as the low output, evidence-channel validity (Section~\ref{sec:positioning}) is non-interference of the construction map. Because non-interference relates pairs of executions, self-composition reduces it to a property of a program composed with a renamed copy of itself \citep{barthe2004selfcomposition}; executing such a composition on inputs with equal low and different high components and asserting equal outputs yields a dynamic test, which certifies invariance only over the tested perturbations and therefore complements static information-flow control \citep{sabelfeld2003ifc}. A build is \emph{reproducible} when a declared source tree and a deterministic toolchain produce a bit-identical artefact, so that provenance can be verified by digest \citep{lamb2022reproducible}; EIDOS applies this discipline to fitted equations through deterministic maps, canonical binary serialisation, and archived SHA-256 digests, a discipline that excludes unseeded generators, hash-ordered iteration, thread-ordered floating-point reductions, and embedded timestamps (Sections~\ref{sec:contract} and~\ref{sec:reverify}). \emph{Metamorphic testing} checks a necessary relation between the outputs for transformed inputs when no oracle specifies the correct output, and has also been applied to machine-learning software \citep{chen2018metamorphic}. In EIDOS the relation is payload invariance under admissible transformations of the later-role data, and transformations that preserve different statistical invariants expose different leakage pathways (Section~\ref{sec:leakdesign}).
+
+\section{A verification specification for ingested equations}\label{sec:positioning}
+
+\subsection{Representation channel}
+
+An SR pipeline supports \emph{predictive} claims about the out-of-sample risk of a fitted mapping, \emph{representational} claims about a finite serialised record whose syntax, constants, precision, and decoding rules determine the predictor that another agent reconstructs, and \emph{scientific} claims about the data-generating mechanism, which accuracy alone cannot establish because finite noisy samples admit distinct closed forms of comparable risk \citep{fajardofontiveros2023limits}. Knowledge-base ingestion operates at the representational level, which reporting conventions often leave underspecified: a complexity score is an MDL codelength only under an explicit prefix code or Kraft-valid probability assignment \citep{rissanen1978,grunwald2007mdl}, and a node-count penalty is not such a code when fitted constants are excluded, rounding precision is undeclared, or a continuous likelihood lacks a reference measure and quantisation convention.
+
+\begin{definition}[Representation-channel validity]\label{def:representation}
+Relative to a frozen context \(C\) (Section~\ref{sec:roles}) and the observed construction covariates, an SR pipeline is \emph{representation-valid} if (i) every candidate record evaluated during selection, and the final reported refit, is exactly reconstructible from its transmitted binary description and \(C\); (ii) every structural, preprocessing, or numerical choice that can alter a selection score or decoded predictor is either transmitted in the record or fixed in \(C\); (iii) the observation codelength is induced by a normalised probability mass function on a declared observation coding space (or, when derived from a density, its reference measure, physical units, and discretisation resolution are fixed precisely enough to determine the probability mass of every recorded outcome); and (iv) every selection score is a deterministic function of \(C\), the construction observations, and decoded finite records only, so that it is evaluated on the finite-precision object reconstructed by the decoder rather than on an untransmitted full-precision optimum.
+\end{definition}
+
+Condition (iv) also applies to multi-fold criteria such as cross-validation error: each fold predictor must itself be a decodable record produced by the declared fitting map. Table~\ref{tab:reporting} assesses common SR reporting practices against Definition~\ref{def:representation}; node counts and Gaussian likelihoods with parameter counts omit coefficient precision, preprocessing state, and observation discretisation, whereas MDL-guided SR and Bayesian expression posteriors can satisfy the definition when augmented with the listed state, including, for neural generators \citep{petersen2020dsr,kamienny2022e2e}, versioned checkpoints and tokenisers.
+
+\begin{table*}[t]
+\def\baselinestretch{1}\selectfont
+\caption{Representative SR reporting practices assessed against Definition~\ref{def:representation}, based on the artefacts usually reported; any method family satisfies the definition when augmented with the state in the rightmost column.}\label{tab:reporting}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.0pt}
+\renewcommand{\arraystretch}{1.16}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.15\textwidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Criterion or reporting pattern} & \textbf{Reconstructible from usual reported artefacts?} & \textbf{Explicit observation coding convention?} & \textbf{Additional artefacts or conventions required} \\
+\midrule
+Node-count complexity penalty & Generally no & No & Fitted constants, quantisation precision, preprocessing state, and observation-space and response-resolution conventions \\
+Gaussian likelihood plus parameter count & Generally no & Not by itself & Coefficient precision, response reference measure, recording or quantisation convention, physical units, and all fitted scale parameters \\
+MDL-guided SR selection \citep{bartlett2024exhaustive,yu2025mdlformer} & Implementation-dependent & Implementation-dependent & Exact parameter code, observation law and reference measure, precision convention, score-relevant optimiser state, and any learned checkpoint, tokeniser, and corpus \\
+Bayesian posterior over expressions \citep{guimera2020bms} & Implementation-dependent & Implementation-dependent & Structure and parameter priors, support bounds, observation law and reference measure, numerical precision, and the posterior or sampler state needed for the reported object \\
+EIDOS (this work) & Yes, conditional on the archived contexts \(C_0\) and \(C\) (Section~\ref{sec:roles}) and the construction covariates & Yes & Canonical context and role artefacts, schema and software versions, and the canonical payload \(P\) (Section~\ref{sec:contract}) \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\subsection{Evidence channel}
+
+Let \(P\) denote the canonical, versioned \emph{model-construction payload}: the serialised record of discovery, selection, and refit outputs that uniquely specifies the selected and reported model. Downstream outputs (verification statistics, conformal radii, test errors, and access logs) depend on later-role data and are stored in separate certificates outside \(P\).
+
+\begingroup\sloppy
+\begin{definition}[Evidence-channel validity]\label{def:evidencechannel}
+A pipeline is \emph{evidence-valid relative to declared data roles} if, conditional on the model-construction roles and the frozen contexts, every admissible replacement of the verification, calibration, or test observations leaves the canonical model-construction payload \(P\) byte-identical. A replacement dataset is admissible when it conforms to the declared input schema and domain support of the corresponding role.
+\end{definition}
+\endgroup
+
+Definition~\ref{def:evidencechannel} expresses non-interference of the construction map (Section~\ref{sec:paradigms}) and yields an executable test: replace a later-role dataset with an independent admissible draw, rerun construction from the frozen context, and compare \(P\) byte for byte with the archived payload. A compliant pipeline reproduces \(P\) on every draw, whereas a pipeline whose selection or refitting reads later-role data is detected whenever its construction payload changes. The procedure is a one-sided falsification test of influence over the tested perturbations, not a proof of non-access; it targets implementation bugs, undeclared hyperparameter coupling, and analyst shortcuts. Hard-coding holdout-informed choices into \(C_0\) would leave \(P\) invariant under replacement; it is addressed by committing the context digests, for example to a timestamped registry, before the later roles are opened (check R1, Section~\ref{sec:reverify}).
+
+\begin{definition}[Dual-channel evidential validity]\label{def:dual}
+Relative to a frozen context \(C\) and a declared data-role partition, a pipeline is \emph{dual-channel valid} if it satisfies Definitions~\ref{def:representation} and~\ref{def:evidencechannel} under a single context and data-role graph.
+\end{definition}
+
+Dual-channel validity concerns the archival integrity and isolation of the admitted record; downstream certificates keep their own assumptions. For example, finite-sample conformal coverage requires exchangeability between calibration and test observations or an explicit shift adjustment \citep{lei2018conformal,barber2023exchangeability}.
+
+\section{EIDOS}\label{sec:eidos}
+
+\subsection{Roles, frozen context, and notation}\label{sec:roles}
+
+EIDOS partitions the \(N_{\rm tot}\) observations \(\{(x_i,y_i)\}_{i=1}^{N_{\rm tot}}\) into five pairwise disjoint roles \(D_{\rm disc}\), \(D_{\rm diag}\), \(D_{\rm ver}\), \(D_{\rm cal}\), and \(D_{\rm test}\) (discovery, diagnosis, verification, calibration, and test). Only the \emph{construction roles} \(D_{\rm disc}\) and \(D_{\rm diag}\) (\(n_{\rm c}\) rows in total) may influence candidate generation, selection, and refitting; the \emph{later roles} \(D_{\rm ver}\), \(D_{\rm cal}\) (\(n\) rows), and \(D_{\rm test}\) (\(n_{\rm test}\) rows) only evaluate the fixed reported model to produce diagnostic, uncertainty, and predictive certificates.
+
+The globally frozen protocol context \(C_0\) specifies the software and schema versions, the 17-token grammar catalogue, the coding families, the response-model constants \((\nu,\varepsilon,\rho)\), the parameter-grid tolerances, and all deterministic hyperparameters (Appendix~\ref{app:settings}). For each task, the discovery map \(A_{\rm disc}\) uses \(D_{\rm disc}\) alone to produce the task context \(C=A_{\rm disc}(D_{\rm disc};C_0)\), which freezes the discovery-fitted feature and target transformations, the origin \(o\) and resolution \(\Delta>0\) of the response quantiser, the grid-selection rule, the screened features, the candidate bank \(\mathcal T_C\) with its canonical order, the cross-fitting folds, and all task-derived seeds. In knowledge-engineering terms, \((C_0,C)\) acts as an operational \emph{task ontology}: a versioned, typed vocabulary whose admissibility rules and coding conventions give every symbol a unique operational meaning, so post-selection data cannot alter the hypothesis space or the coding measure. Table~\ref{tab:notation} summarises the notation; expressions condition implicitly on \((C_0,C)\) and the construction covariates.
+
+\begin{table}[t]
+\def\baselinestretch{1}\selectfont
+\caption{Summary of core notation.}\label{tab:notation}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\renewcommand{\arraystretch}{1.10}
+\begin{tabularx}{\columnwidth}{@{}>{\raggedright\arraybackslash}p{0.27\columnwidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Symbol} & \textbf{Meaning} \\
+\midrule
+\(D_{\rm disc},D_{\rm diag}\) & Construction roles (discovery and diagnosis); \(n_{\rm c}=|D_{\rm disc}\cup D_{\rm diag}|\) \\
+\(D_{\rm ver},D_{\rm cal},D_{\rm test}\) & Later roles (verification, calibration of size \(n=|D_{\rm cal}|\), and test of size \(n_{\rm test}=|D_{\rm test}|\)) \\
+\(C_0\), \(C\) & Globally frozen protocol context and discovery-generated task context \\
+\(A_{\rm disc},S_C,R_C\) & Deterministic discovery, selection, and grid-quantised fitting/refit maps \\
+\(m=(T,e,q)\), \(\mathcal T_C\), \(d(T)\) & Finite record with structure \(T\), grid exponent \(e\in\{3,\ldots,9\}\), and indices \(q\in\mathbb Z^{d(T)}\); bank of admissible structures; number of fitted parameters \\
+\(N\), \(X\), \(\mathbf k\) & Number of coded diagnosis observations, covariate matrix, and discretised response-symbol vector \\
+\(\theta_j\), \(h_j\), \(q_j\), \(\widetilde\theta_j\) & Full-precision fitted value, grid step, transmitted integer index, and decoded value of coefficient \(j\) \\
+\(\Delta\), \(o\), \(k(y)\), \(B_k\) & Response coding resolution, origin, integer symbol of response \(y\), and half-open quantisation bin \\
+\(\nu,\varepsilon,\rho\) & Student-\(t\) degrees of freedom, escape mixture weight, and geometric escape decay parameter \\
+\(\ell_{\rm s},\ell_{\rm p},\ell_{r,i}\), \(L_{\mathrm{EIDOS}}\) & Structure, parameter, and per-observation response codelengths, and their sum, the joint conditional description length \\
+\(\widehat T,\widehat T_{\rm rep},\widehat q_{\rm sel},\widehat q_{\rm rep}\) & Selected structure, reported structure, and their parameter indices \\
+\(\widehat e_{\rm sel},\widehat e_{\rm rep},\widehat m_{\rm rep}\) & Selected and reported grid exponents; reported model record \\
+\(P\), \(\operatorname{Ser}_{C_0,C}\), \(\operatorname{Dec}_{C_0,C}\) & Canonical model-construction payload, binary serialisation map, and prefix decoder \\
+\(t\), \(\pi\), \(\pi_w\) & Number of replacement reruns, per-draw payload-change probability, and its value for task-partition entry \(w\) (Appendix~\ref{app:theory}) \\
+\(\lambda\), \(K_\lambda(m)\) & Calibration leakage weight and graded selection key in the leakage-detection study \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Every candidate is a finite record \(m=(T,e,q)\) with symbolic tree \(T\in\mathcal T_C\), grid exponent \(e\in\{3,\ldots,9\}\), and integer indices \(q=(q_1,\ldots,q_{d(T)})^\top\) of all fitted location coefficients and the global residual scale \(\sigma>0\), stored last, on the declared grid. For a structure \(T\) and fit set \(S\) (\(D_{\rm disc}\), the union of two cross-fitting folds of \(D_{\rm disc}\), or \(D_{\rm disc}\cup D_{\rm diag}\)), the fitting map \(R_C\) standardises each non-constant basis function of \(T\) by its mean and standard deviation on \(S\), solves a ridge-regularised least-squares problem, and maps the solution directly to integer indices, so diagnosis evaluates the decoded record \((T,\widehat e_{\rm sel}(T),\widehat q_{\rm sel}(T))\) rather than an unquantised approximation. The standardisation constants are deterministic functions of \(T\) and the covariates of \(S\), so the decoder recomputes them at no codelength; their binary64 values are also stored in \(P\), so the admitted predictor can be evaluated on new inputs without the construction data. After selection fixes \(\widehat T\) and \(\widehat q_{\rm sel}\), \(R_C\) refines and refits on \(D_{\rm disc}\cup D_{\rm diag}\) to give the reported record \(\widehat m_{\rm rep}=(\widehat T_{\rm rep},\widehat e_{\rm rep},\widehat q_{\rm rep})\), and \(\operatorname{Ser}_{C_0,C}\) packs both model records and the score ledger into \(P\).
+
+\subsection{Ingestion contract, archive, and protocol}\label{sec:contract}
+
+\begin{definition}[EIDOS ingestion contract]\label{def:eidoscontract}
+For frozen contexts \((C_0,C)\) and declared data roles, the EIDOS ingestion contract requires that (i) every score attributed to a candidate structure \(T\) is evaluated on grid-quantised records produced by \(R_C\), namely the diagnosis RMSE and codelength on the decoded discovery record \((T,\widehat e_{\rm sel}(T),\widehat q_{\rm sel}(T))\) and the cross-fit RMSE on fold records quantised before out-of-fold prediction; (ii) the post-selection refit \(\widehat m_{\rm rep}=(\widehat T_{\rm rep},\widehat e_{\rm rep},\widehat q_{\rm rep})\) is encoded as a finite record under the same grid convention; (iii) \(D_{\rm ver}\), \(D_{\rm cal}\), and \(D_{\rm test}\) are excluded from all maps that construct \(P\); (iv) the discovery map \(A_{\rm disc}\), selection map \(S_C\), and fitting map \(R_C\) are deterministic functions of their declared inputs, with all internal pseudorandom operations seeded from \((C_0,C)\) only; and (v) \(P\) follows a unique binary serialisation whose schema version, field order, numeric representation, and byte order are fixed in \(C_0\).
+\end{definition}
+
+Clauses (iv) and (v) impose the reproducible-build discipline: a compliant pipeline emits an identical byte sequence whenever it is rerun on the same construction data. Each field of \(P\) is a canonical integer or string identifier (schema version, bank and structure identifiers, \(\widehat T_{\rm rep}\), \(\widehat e_{\rm sel}\), \(\widehat e_{\rm rep}\), \(\widehat q_{\rm sel}\), \(\widehat q_{\rm rep}\), candidate ranking, and tie-break indicator), a SHA-256 digest of a constituent finite record (\(C_0\), \(C\), \(\mathcal T_C\), the discovery, fold, and refit records, and the score ledger), or an exact IEEE-754 binary64 value (the score-ledger keys and the basis standardisation constants of the reported record), so byte identity needs no floating-point tolerance on the archived platform. The \emph{score ledger} records the lexicographic key of every admissible candidate together with the ridge-multiplier keys and sparse-union arbitration scores of the refit stage (Section~\ref{sec:isolation}). Because the ledger is a deterministic function of the construction roles, committing it can only add detections, never false alarms.
+
+Besides \(P\), an EIDOS archive stores the serialised contexts and the role manifest (mapping observation identifiers to roles) with their digests, the decomposed codelengths, score-to-decoder vectors (decoded predictions on sampled construction rows with recomputed scores), and the downstream certificates: the verification MMD statistic and \(p\)-value, the calibration level, quantile index, and conformal radius, the replacement-test record (draws, strategy, payload digests, and field-level differences), and the single-use test log. Replacement testing asserts byte invariance on \(P\) only, because these certificates legitimately depend on later-role data. Figure~\ref{fig:framework} shows the architecture and Algorithm~\ref{alg:eidos} the ingestion workflow.
+
+\begin{figure*}[tp]
+\centering
+\includegraphics[width=\textwidth]{Figure_1.pdf}
+\caption{Architecture of EIDOS. Top: the \(N_{\rm tot}\) observations are partitioned into five disjoint roles; under the frozen context \((C_0,C)\), discovery screens the candidate bank on \(D_{\rm disc}\), diagnosis selects \(\widehat T\) using \(D_{\rm disc}\) and \(D_{\rm diag}\), and refitting on \(D_{\rm disc}\cup D_{\rm diag}\) emits \(\widehat m_{\rm rep}=(\widehat T_{\rm rep},\widehat e_{\rm rep},\widehat q_{\rm rep})\) (schematic worked example at top right, with basis standardisation and intercept omitted). Middle: the representation channel codes structures (Box A), grid parameters (Box B), and finite-bin responses (Box C); the evidence channel restricts \(D_{\rm ver}\), \(D_{\rm cal}\), and \(D_{\rm test}\) to read-only evaluation of \(\widehat m_{\rm rep}\). Bottom: joint Kraft validity and construction-map non-interference together establish dual-channel validity.}\label{fig:framework}
+\end{figure*}
+
+\begin{algorithm}[t]
+\caption{EIDOS ingestion protocol for a candidate symbolic relation}\label{alg:eidos}
+\begin{algorithmic}[1]
+\State \textbf{Role assignment.} Partition the observations into \(D_{\rm disc}\), \(D_{\rm diag}\), \(D_{\rm ver}\), \(D_{\rm cal}\), and \(D_{\rm test}\); archive the role manifest and its SHA-256 digest.
+\State \textbf{Discovery.} Compute \(C\gets A_{\rm disc}(D_{\rm disc};C_0)\): fit discovery-only transformations, instantiate and screen \(\mathcal T_C\), fit each admissible candidate on \(D_{\rm disc}\) as a grid-quantised record, and freeze grids, folds, and seeds (Section~\ref{sec:candidates}).
+\State \textbf{Diagnosis and selection.} Evaluate the lexicographic key of every admissible \(T\in\mathcal T_C\), commit all keys to the score ledger, and select \((\widehat T,\widehat e_{\rm sel},\widehat q_{\rm sel})\) (Section~\ref{sec:isolation}).
+\State \textbf{Refit and serialisation.} Tune the ridge multiplier of \(\widehat T\); keep the sparse-union alternative built on \(D_{\rm disc}\) only if it lowers RMSE on \(D_{\rm diag}\); refit the winner on \(D_{\rm disc}\cup D_{\rm diag}\); serialise \(P\) (including the ledger) and emit \(\widehat m_{\rm rep}\).
+\State \textbf{Verification.} Compute the permutation maximum mean discrepancy (MMD) residual diagnostic of \(\widehat m_{\rm rep}\) on \(D_{\rm ver}\).
+\State \textbf{Calibration.} Compute the split-conformal interval radius on \(D_{\rm cal}\).
+\State \textbf{Replacement test.} For each later role covered by the isolation certificate, rerun Steps 2--4 statelessly from the frozen context with \(t\ge1\) independent admissible replacements; admit \(\widehat m_{\rm rep}\) only if every regenerated payload is byte-identical to \(P\).
+\State \textbf{Single-use test.} Evaluate \(\widehat m_{\rm rep}\) once on \(D_{\rm test}\); archive \(P\), the context and role artefacts, and all certificates.
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Candidate generation under the frozen context}\label{sec:candidates}
+
+Instead of an open-ended stochastic search whose trajectory is hard to version and replay, EIDOS enumerates a finite bank \(\mathcal T_C\) of \(b\le2{,}600\) structures per task over the discovery-screened features and transformations, using a 17-token grammar catalogue (16 active fixed-arity operators and one reserved schema token); the bank, its traversal order, and its seeds are frozen in \(C\) before \(D_{\rm diag}\) is accessed, so any maintainer can regenerate the candidate space. Besides univariate nonlinearities, polynomials, trigonometric and radial basis terms, and piecewise-linear hinges, \(\mathcal T_C\) contains two parametric families whose shape parameters are estimated on \(D_{\rm disc}\) only. The \emph{pairwise trigonometric} family adds \(\sin\) and \(\cos\) terms of \(\beta x_ix_j\) and \(\beta(x_i\pm x_j)\), \(\beta\in\{0.60,1.20\}\), over the five features most correlated with the discovery response. The \emph{monomial} family is instantiated when the raw response and a subset of raw features keep a strict constant sign on \(D_{\rm disc}\): exponents \(a_j\) in \(|y|\propto\prod_j|x_j|^{a_j}\) are estimated by least squares in log coordinates, snapped to the nearest half-integer when within \(0.05\) of it, and compiled into a single basis expression through the discovery-fitted affine transformation stored in \(C\), so multiplicative scaling laws are represented exactly. A discovery-only \emph{admissibility screen} uses interval arithmetic over the discovery feature ranges to prune candidates whose denominator interval contains zero, whose logarithmic argument can be non-positive, whose fractional-power argument can be negative, or whose discovery predictions are non-finite. The controlled recovery study (Section~\ref{sec:recoverydesign}) replaces enumeration by a single task-independent bank of 240 anonymised candidates.
+
+With \(n_{\rm c}\) construction rows, \(N\) coded diagnosis rows, and maximum basis dimension \(d=\max_{T\in\mathcal T_C}d(T)\), the ridge solves for one discovery fit and three cross-fitting folds per candidate cost \(O\big(b(n_{\rm c}d^{2}+d^{3})\big)\) operations, the finite-bin response masses \(O(bN)\) (Appendix~\ref{app:stablebins}), and ridge tuning eight refits. The bounded bank thus makes cost predictable (Section~\ref{sec:predictiveresults}) and structure-recovery claims well defined relative to \(\mathcal T_C\).
+
+\subsection{Response code}\label{sec:representationcode}
+
+To satisfy condition (iii) of Definition~\ref{def:representation}, EIDOS codes observations on an explicit discretised response space. The coding resolution \(\Delta\) is set to the measurement resolution when it is known; otherwise \(\Delta=10^{-3}\) and the origin \(o=0\) are fixed by convention on the discovery-standardised response. Each response \(y\in\mathbb R\) is mapped to the integer symbol
+\begin{equation}\label{eq:quantizer}
+k(y)=\left\lfloor (y-o)/\Delta+\tfrac12\right\rfloor,
+\end{equation}
+that is, to the half-open bin
+\begin{equation}\label{eq:bin}
+B_k=[o+(k-\tfrac12)\Delta,\;o+(k+\tfrac12)\Delta);
+\end{equation}
+these bins partition \(\mathbb R\), so every \(y_i\) receives a unique symbol \(k_i=k(y_i)\in\mathbb Z\).
+
+For observation \(i\), let \(\mu_i(m)\) and \(\sigma_i(m)=10^{-e}q_{d(T)}>0\) denote the conditional location and scale of the decoded record \(m=(T,e,q)\). For robustness to isolated outliers, EIDOS uses a Student-\(t\) law with \(\nu=3\) degrees of freedom and standardised density \(t_\nu(u)=\frac{\Gamma((\nu+1)/2)}{\sqrt{\nu\pi}\,\Gamma(\nu/2)}(1+u^2/\nu)^{-(\nu+1)/2}\). Integrating it over \(B_k\) and mixing with a two-sided geometric escape mass \(g_\rho(k)\) gives the normalised bin mass
+\begin{align}
+p_{m,i}(k\mid x_i,C)
+&=\int_{B_k}\sigma_i(m)^{-1}t_\nu\!\left(\frac{z-\mu_i(m)}{\sigma_i(m)}\right)dz,\label{eq:tbinmass}\\
+r_{m,i}(k\mid x_i,C)
+&=(1-\varepsilon)p_{m,i}(k\mid x_i,C)+\varepsilon g_\rho(k),\label{eq:binmass}\\
+g_\rho(k)&=\frac{1-\rho}{1+\rho}\rho^{|k|},\label{eq:escape}
+\end{align}
+with escape weight \(\varepsilon=10^{-4}\) and decay \(\rho=0.98\) fixed in \(C_0\). Because \(g_\rho\) is a probability mass function on \(\mathbb Z\), \(r_{m,i}\) is normalised and strictly positive, so codelengths remain finite even when extreme residuals make \(p_{m,i}\) underflow (Appendices~\ref{app:paramresponse} and~\ref{app:stablebins}). A point-density codelength \(-\log_2 f_{m,i}(y_i)\), where \(f_{m,i}\) is the integrand of Eq.~\eqref{eq:tbinmass}, can be negative and, at zero residual, diverges to \(-\infty\) as \(\sigma_i(m)\to0\), whereas the bin codelength always lies in \([0,\infty)\). For \(\varepsilon=0\) and \(\Delta\ll\sigma_i(m)\), the midpoint rule gives \(p_{m,i}(k_i\mid x_i,C)=\Delta f_{m,i}(o+k_i\Delta)\{1+O((\Delta/\sigma_i(m))^2)\}\) because \(|t_3''/t_3|\le25/18\), so the code differs from a midpoint log-density score essentially by the offset \(N\log_2(1/\Delta)\), which is common to all candidates.
+
+\subsection{Structure and parameter codes}\label{sec:codes}
+
+Each structure \(T\in\mathcal T_C\) with \(n(T)\ge1\) nodes is serialised as a prefix-free string of three fields: the Elias-gamma codeword for \(n(T)\) \citep{elias1975codes}, of length \(\ell_\gamma(n(T))=2\lfloor\log_2 n(T)\rfloor+1\) bits; \(n(T)\) five-bit grammar tokens in canonical preorder; and fixed-width or self-delimiting leaf payloads (variable indices and basis lengths). Because only 17 of the 32 five-bit values are assigned, the structural Kraft sum is below one (Appendix~\ref{app:structural}). Fitted coefficients are kept out of the tree and encoded once in the parameter vector; \(\ell_{\rm s}(T\mid C)\) denotes the structural codelength.
+
+For coefficient \(j\in\{1,\ldots,d(T)\}\) with full-precision fitted value \(\theta_j\in\mathbb R\) and grid step \(h_j=10^{-e}>0\), the transmitted index and decoded value are
+\begin{equation}\label{eq:grid}
+q_j=\left\lfloor \theta_j/h_j+\tfrac12\right\rfloor,
+\qquad \widetilde\theta_j=h_jq_j.
+\end{equation}
+Each \(q_j\) is encoded by a sign bit (\(0\) for \(q_j\ge0\), so \(q_j=0\) has a unique representation) followed by the Elias-delta code \citep{elias1975codes} of \(|q_j|+1\):
+\begin{equation}\label{eq:paramprior}
+\ell_{\rm p}(e,q\mid T,C)=\ell_\gamma(e-2)+\sum_{j=1}^{d(T)}\Big(1+\ell_\delta\big(|q_j|+1\big)\Big),
+\end{equation}
+where \(\ell_\delta(m)=\lfloor\log_2 m\rfloor+2\lfloor\log_2(\lfloor\log_2 m\rfloor+1)\rfloor+1\) for \(m\in\mathbb Z_{>0}\). The concatenated codewords form a prefix code with \(\sum_{e=3}^{9}\sum_{q\in\mathbb Z^{d(T)}} 2^{-\ell_{\rm p}(e,q\mid T,C)}\le1\) (Appendix~\ref{app:paramresponse}). Because \(\ell_\delta\) grows logarithmically in \(|q_j|\), large coefficient magnitudes incur logarithmic coding costs: at \(h_j=10^{-3}\), the coefficient \(\theta_j=7.04\) costs 20 bits, whereas a geometric code of the form of Eq.~\eqref{eq:escape} with decay 0.80 would cost 2{,}270 bits.
+
+\begin{remark}[Precision-matched grid]\label{rem:quantisation}
+Scoring the decoded parameters \(\widetilde\theta\) makes the scored predictor identical to the archived record. Under a common step \(h\), \(|\theta_j-\widetilde\theta_j|\le h/2\); since \(R_C\) scales every basis column to unit root-mean-square norm on the fit set, the root-mean-square perturbation of the fitted values is at most \(d(T)h/2\) (Appendix~\ref{app:paramresponse}). A fixed step \(h=10^{-3}\) would therefore dominate the error of near-exact laws, whose full-precision fit-set RMSE \(\mathrm{RMSE}_{\rm fp}\) approaches zero. EIDOS instead uses, for each fitted record, the coarsest step \(h=10^{-e}\), \(e\in\{3,\ldots,9\}\), with \(d(T)h/2\le\kappa\,\mathrm{RMSE}_{\rm fp}\) (or \(e=9\) if none qualifies), where \(\kappa=0.01\) is frozen in \(C_0\); whenever a step qualifies, the quantised record satisfies \(\mathrm{RMSE}_{\rm q}\le(1+\kappa)\,\mathrm{RMSE}_{\rm fp}\). The offset \(e-3\) is transmitted as the Elias-gamma codeword for \(e-2\), which keeps the joint code over \((e,q)\) Kraft-valid.
+\end{remark}
+
+With per-observation response codelength \(\ell_{r,i}(m,k_i\mid x_i,C)=-\log_2 r_{m,i}(k_i\mid x_i,C)\), the joint conditional description length of a record \(m=(T,e,q)\) over the \(N\) diagnosis observations with covariate matrix \(X\) and symbol vector \(\mathbf k=(k_1,\ldots,k_N)^\top\in\mathbb Z^N\) is
+\begin{equation}\label{eq:eidoscode}
+L_{\mathrm{EIDOS}}(T,e,q,\mathbf k\mid X,C)=\ell_{\rm s}(T\mid C)+\ell_{\rm p}(e,q\mid T,C)+\sum_{i=1}^{N}\ell_{r,i}(m,k_i\mid x_i,C),
+\end{equation}
+in which the structure and parameter terms are exact integer bit lengths of prefix-decodable fields and the response term sums ideal Shannon codelengths.
+
+\subsection{Selection, refit, and evidence-isolated evaluation}\label{sec:isolation}
+
+Given \(C=A_{\rm disc}(D_{\rm disc};C_0)\), selection and refitting are deterministic maps of \(D_{\rm disc}\), \(D_{\rm diag}\), and \((C_0,C)\) only:
+\begin{equation}\label{eq:selectionmap}
+\begin{aligned}
+(\widehat T,\widehat e_{\rm sel},\widehat q_{\rm sel})&=S_C(D_{\rm disc},D_{\rm diag}),\\
+(\widehat T_{\rm rep},\widehat e_{\rm rep},\widehat q_{\rm rep})&=R_C(\widehat T,D_{\rm disc},D_{\rm diag}),\\
+\widehat m_{\rm rep}&=(\widehat T_{\rm rep},\widehat e_{\rm rep},\widehat q_{\rm rep}).
+\end{aligned}
+\end{equation}
+Because \(D_{\rm ver}\), \(D_{\rm cal}\), and \(D_{\rm test}\) lie outside the domain of \(A_{\rm disc}\), \(S_C\), and \(R_C\), the payload \(P=\operatorname{Ser}_{C_0,C}(\widehat T,\allowbreak\widehat e_{\rm sel},\allowbreak\widehat q_{\rm sel},\allowbreak\widehat T_{\rm rep},\allowbreak\widehat e_{\rm rep},\allowbreak\widehat q_{\rm rep},\allowbreak\text{score ledger})\) is functionally isolated from all later-role observations.
+
+\paragraph{Lexicographic selection rule} For every admissible \(T\in\mathcal T_C\), \(S_C\) computes a four-component key: (a) the three-fold cross-fit RMSE on \(D_{\rm disc}\) under the folds frozen in \(C\), each fold predictor being fitted by \(R_C\) on two folds and quantised before predicting the third; (b) the diagnosis RMSE of the decoded record \((T,\widehat e_{\rm sel}(T),\widehat q_{\rm sel}(T))\) on \(D_{\rm diag}\); (c) the codelength \(L_{\mathrm{EIDOS}}(T,\widehat e_{\rm sel}(T),\widehat q_{\rm sel}(T),\mathbf k\mid X,C)\) on \(D_{\rm diag}\); and (d) the negative permutation \(p\)-value of a kernel maximum mean discrepancy (MMD) statistic for residual shift across five covariate proxy strata of \(D_{\rm diag}\) (quantile bins of the first raw feature; Section~\ref{sec:benchmark}). Candidates are ranked by (a), with (b), (c), and (d) breaking exact ties in that order; canonical bank order resolves remaining ties. The top candidate fixes \((\widehat T,\widehat e_{\rm sel},\widehat q_{\rm sel})\). The MMD criterion is a tie-break rather than a hard filter because its studentised statistic is scale-invariant, so a filter would reject low-error candidates whose small approximation errors vary in shape across strata (Table~\ref{tab:ablation}).
+
+\paragraph{Ridge tuning and diagnosis-arbitrated sparse-union refit} \(R_C\) then tunes the ridge penalty of \(\widehat T\) over the multipliers \(\{0.25,0.50,0.75,1.00,\allowbreak 1.25,1.50,2.00,4.00\}\) of a unit base penalty by the pooled discovery cross-fit and diagnosis RMSE. EIDOS also builds one \emph{refined record} on \(D_{\rm disc}\) alone: it pools the basis dictionaries of the top five structures that receive positive weight in a non-negative least-squares stack of their out-of-fold predictions, computes a lasso path over this union, and refits by ridge the smallest active support whose cross-fit RMSE is within \(1.0\%\) of the path minimum. Diagnosis chooses \(\widehat T_{\rm rep}\) as the refined structure when its RMSE on \(D_{\rm diag}\) is strictly lower and as \(\widehat T\) otherwise; the winner is refitted on \(D_{\rm disc}\cup D_{\rm diag}\) and quantised to give \(\widehat q_{\rm rep}\). A linear combination over a union of bases is still a grid-quantised tree, so the refined record is encoded by the same code (Section~\ref{sec:formal}); all tuning keys and arbitration scores enter the score ledger.
+
+\paragraph{Evidence-isolated later roles} The later roles operate only on the fixed predictor \(\widehat m_{\rm rep}\). On \(D_{\rm ver}\), a permutation kernel MMD diagnostic \citep{gretton2012mmd} tests residual non-stationarity across the five strata; because roles can be as small as twelve rows near the 80-row eligibility threshold, it is archived as a review certificate rather than used as an admission gate. On \(D_{\rm cal}\), the absolute residuals \(\{|y_i-\widehat\mu(x_i)|\}_{i=1}^n\) and a miscoverage level \(\alpha\in(0,1)\) give the split-conformal order-statistic index
+\begin{equation}\label{eq:conformal}
+j=\left\lceil(n+1)(1-\alpha)\right\rceil,
+\end{equation}
+and the interval radius is the \(j\)th smallest residual when \(j\le n\) and \(+\infty\) otherwise. We evaluate \emph{pooled} split-conformal intervals (one quantile over all \(n\) calibration rows) and stratum-conditional \emph{Mondrian} intervals \citep{vovk2005alrw} (Eq.~\eqref{eq:conformal} within each proxy stratum, with radius \(+\infty\) for an empty stratum). The shift experiment additionally uses nearest-stratum transfer, assigning an empty stratum the nearest calibrated radius. Finally, \(D_{\rm test}\) is evaluated once to produce the predictive test certificate.
+
+\subsection{Re-verification by a maintainer}\label{sec:reverify}
+
+An EIDOS archive lets any maintainer run three checks without the original analysts:
+\begin{itemize}
+\item \textbf{(R1) Context and role integrity:} recompute the SHA-256 digests of \(C_0\), \(C\), and the role manifest and compare them with the archived digests, which binds the entry to a fixed vocabulary and data split.
+\item \textbf{(R2) Decoding and score reconstruction:} apply \(\operatorname{Dec}_{C_0,C}\) to \(P\) to recover both selected and reported model records and recompute \(\ell_{\rm s}\) and \(\ell_{\rm p}\); when the construction observations are archived, also recompute the standardisation constants, the response codelength, the selection keys, and the score-to-decoder vectors and verify exact identity.
+\item \textbf{(R3) Replacement testing:} rerun construction from the frozen contexts with \(t\ge1\) independent admissible replacements of the later roles and verify that each regenerated payload is byte-identical to \(P\).
+\end{itemize}
+R1 and R2 verify identifiability (a reproducible build); R1 and R3 test traceability (non-interference checked by metamorphic testing).
+
+\subsection{Formal results}\label{sec:formal}
+
+We now state the guarantees that underlie checks R1--R3.
+
+\begin{proposition}[Exact reconstruction]\label{prop:reconstruction}
+Fix \((C_0,C)\) and let \(\operatorname{Dec}_{C_0,C}\) be the prefix decoder induced by the serialisation conventions of Sections~\ref{sec:contract} and~\ref{sec:codes}. Under the ingestion contract (Definition~\ref{def:eidoscontract}): (i) \(\operatorname{Dec}_{C_0,C}(\operatorname{Ser}_{C_0,C}(T,e,q))=(T,e,q)\) for every candidate record, every cross-fitting fold record, and both \((\widehat T,\widehat e_{\rm sel},\widehat q_{\rm sel})\) and \((\widehat T_{\rm rep},\widehat e_{\rm rep},\widehat q_{\rm rep})\); (ii) \(\ell_{\rm s}(T\mid C)\) and \(\ell_{\rm p}(e,q\mid T,C)\) are exactly recomputable from the decoded record and \(C\), and every response codelength in Eq.~\eqref{eq:eidoscode} is a deterministic function of the decoded record, \(C\), the response symbols, and the evaluation and fit-set covariates; and (iii) given the archived construction observations, rerunning \(A_{\rm disc}\) and Eq.~\eqref{eq:selectionmap} on the archived platform regenerates \(P\) byte for byte.
+\end{proposition}
+
+The proof is in Appendix~\ref{app:proofreconstruction}; part (ii) shows that no untransmitted optimiser state is needed to reconstruct the predictor or its score.
+
+\begin{theorem}[Conditional joint Kraft validity]\label{thm:jointkraft}
+Fix the task context \(C\). Suppose \(\ell_{\rm s}(\cdot\mid C)\) is a prefix codelength over the admissible structure bank \(\mathcal T_C\), \(\ell_{\rm p}(\cdot,\cdot\mid T,C)\) is a prefix codelength over \(\{3,\ldots,9\}\times\mathbb Z^{d(T)}\), and the response mass \(r_{m,i}(k_i\mid x_i,C)\) in Eq.~\eqref{eq:binmass} is evaluated at the decoded grid parameters \(\widetilde\theta=10^{-e}q\). Write \(\mathcal Q_T^+=\{q\in\mathbb Z^{d(T)}:q_{d(T)}>0\}\) for the positive-scale index vectors. Then, for every fixed \(N\) and covariate matrix \(X\),
+\begin{equation}\label{eq:jointkraft}
+\sum_{T\in\mathcal T_C}\sum_{e=3}^{9}\sum_{q\in\mathcal Q_T^+}
+\sum_{\mathbf k\in\mathbb Z^N}
+2^{-L_{\mathrm{EIDOS}}(T,e,q,\mathbf k\mid X,C)}\le 1,
+\end{equation}
+so \(L_{\mathrm{EIDOS}}(T,e,q,\mathbf k\mid X,C)\) in Eq.~\eqref{eq:eidoscode} is a valid conditional joint codelength over symbolic structures, precision exponents, quantised parameter indices, and discretised response vectors.
+\end{theorem}
+
+The proof (Appendix~\ref{app:proofkraft}) factorises the sum into the structural Kraft sum, the conditional parameter Kraft sum, and the product of normalised response masses evaluated at the decoded parameters. Because the structural bound of Appendix~\ref{app:structural} holds for any set of grammar-valid structures, the theorem also holds when \(\mathcal T_C\) is enlarged by the refined record of Section~\ref{sec:isolation}. Rounding \(L_{\mathrm{EIDOS}}\) up to the next integer preserves Eq.~\eqref{eq:jointkraft}, so by the Kraft--McMillan theorem a binary prefix code over complete tuples \((T,e,q,\mathbf k)\) exists with integer lengths and less than one bit of overhead per tuple.
+
+We next establish three properties of the evidence channel.
+
+\begin{proposition}[Replacement invariance]\label{prop:evidence}
+Hold the construction datasets \((D_{\rm disc},D_{\rm diag})\) and contexts \((C_0,C)\) fixed. Under Eq.~\eqref{eq:selectionmap} and clauses (iii)--(v) of Definition~\ref{def:eidoscontract}, replacing any subset of \(D_{\rm ver}\), \(D_{\rm cal}\), or \(D_{\rm test}\) with an admissible dataset leaves both selected and reported model records, the score ledger, and the payload \(P\) invariant.
+\end{proposition}
+
+Proposition~\ref{prop:evidence} (Appendix~\ref{app:proofevidence}) is the non-interference property of the specification and gives the zero-false-alarm baseline for replacement testing.
+
+\begin{proposition}[Operating characteristics of the one-sided replacement test]\label{prop:replacementpower}
+Fix all original datasets, contexts, deterministic maps, and canonical serialisation of Definition~\ref{def:eidoscontract}, and let \(P\) be the reference payload generated with the original later-role data. Execute \(t\ge1\) stateless reruns of model construction, each started from the same frozen context state with a fresh, mutually independent admissible replacement \(\widetilde D_j\) of the tested later roles, and let \(\pi_j=\Pr(P_j\neq P\mid D_{\rm disc},D_{\rm diag},C_0,C,P)\) be the probability that the \(j\)th rerun payload \(P_j\) differs from \(P\). Then:
+\begin{enumerate}
+\item[(i)] \emph{Zero false alarms under compliance:} if the implementation satisfies Eq.~\eqref{eq:selectionmap} and Definition~\ref{def:eidoscontract}, then \(P_j=P\) for all \(j\), so the false-alarm probability is zero.
+\item[(ii)] \emph{Geometric miss law:} for any non-compliant implementation, the events \(\{P_j\neq P\}_{j=1}^t\) are conditionally independent and all \(t\) reruns miss the violation with probability \(\prod_{j=1}^{t}(1-\pi_j)\); for identically distributed draws with \(\pi_j=\pi\), this is \((1-\pi)^t\), which tends to zero as \(t\to\infty\) whenever \(\pi>0\).
+\item[(iii)] \emph{Support boundary:} the test cannot detect a later-role dependence that leaves \(P\) constant on the support of the replacement distribution (\(\pi=0\)), which motivates combining replacement strategies with different statistical invariants.
+\end{enumerate}
+\end{proposition}
+
+Appendix~\ref{app:proofreplacement} gives the proof. For per-draw change probability \(0<\pi<1\), detection probability \(\gamma\) requires \(t=\lceil\log(1-\gamma)/\log(1-\pi)\rceil\) reruns: a violation that changes the payload on 5\% of draws is detected with probability 0.95 after 59 reruns and 0.99 after 90 (\(312\)\,s of parallelisable compute at the median EIDOS runtime of \(3.47\)\,s), whereas the ledger collision mass determines detection of calibration-weighted selection (Theorem~\ref{thm:ledger} in Appendix~\ref{app:theory}).
+
+We call an \emph{admission statistic} any measurable function \(g(P,\widetilde D,C)\) of the payload, a later-role dataset, and the task context, such as held-out RMSE, a residual diagnostic, interval coverage, or record codelength.
+
+\begin{proposition}[Sensitivity dominance of byte comparison]\label{prop:dominance}
+In the setting of Proposition~\ref{prop:replacementpower}, let the \(g\)-detector for an admission statistic \(g\) flag rerun \(j\) whenever \(g(P_j,\widetilde D_j,C)\neq g(P,\widetilde D_j,C)\). Then:
+\begin{enumerate}
+\item[(i)] \emph{Equal false-alarm rate:} for a compliant pipeline, the byte-comparison detector and every \(g\)-detector have false-alarm probability zero.
+\item[(ii)] \emph{Event dominance:} for every implementation, statistic \(g\), and draw \(j\), \(\{g(P_j,\widetilde D_j,C)\neq g(P,\widetilde D_j,C)\}\subseteq\{P_j\neq P\}\); hence byte comparison has at least the detection probability of any admission-statistic detector, uniformly over leakage mechanisms and replacement distributions.
+\item[(iii)] \emph{Detection gap:} writing \(G_j=\{g(P_j,\widetilde D_j,C)\neq g(P,\widetilde D_j,C)\}\), the detection-probability difference equals \(\Pr(P_j\neq P,\,G_j^c)\). Ledger-only changes or zero-coefficient extensions contribute to this difference for statistics determined by the evaluated predictions.
+\end{enumerate}
+\end{proposition}
+
+The proof is in Appendix~\ref{app:proofdominance}. Consequently, no statistic computed from the emitted predictor can be more sensitive than direct payload comparison.
+
+\begingroup\sloppy
+\begin{proposition}[Split-conformal coverage under evidence isolation]\label{prop:conformal}
+Conditional on the fixed reported record \(\widehat m_{\rm rep}\) and task context \(C\), if the \(n\) calibration residual scores on \(D_{\rm cal}\) and a future test residual score on \(D_{\rm test}\) are exchangeable, then the prediction interval constructed with quantile index \(j\) in Eq.~\eqref{eq:conformal} achieves marginal coverage of at least \(1-\alpha\).
+\end{proposition}
+\endgroup
+
+The proof is in Appendix~\ref{app:proofconformal}. Combining the two channels yields the overall guarantee.
+
+\begin{corollary}[Dual-channel validity of EIDOS]\label{cor:dual}
+Under the ingestion contract (Definition~\ref{def:eidoscontract}), archived contexts \((C_0,C)\), grid-quantised fitting and refitting via Eq.~\eqref{eq:selectionmap}, and the hypotheses of Theorem~\ref{thm:jointkraft}, EIDOS satisfies dual-channel validity (Definition~\ref{def:dual}) relative to \(C\) and the declared five-role partition.
+\end{corollary}
+
+\begin{pf}
+Proposition~\ref{prop:reconstruction} and Theorem~\ref{thm:jointkraft}, together with the score-to-decoder identity of Definition~\ref{def:eidoscontract}(i), establish representation-channel validity (Definition~\ref{def:representation}). Proposition~\ref{prop:evidence} establishes evidence-channel validity (Definition~\ref{def:evidencechannel}) under the same contexts and five-role partition, so Definition~\ref{def:dual} holds.
+\end{pf}
+
+\FloatBarrier
+
+\section{Evaluation design}\label{sec:experiments}
+
+We evaluate predictive accuracy and cost on two benchmark tracks (Sections~\ref{sec:benchmark} and~\ref{sec:comparators}), leakage detection (Section~\ref{sec:leakdesign}), structure recovery and interval validity (Section~\ref{sec:recoverydesign}), and component ablations, the cost of the role protocol, and representation checks (Section~\ref{sec:ablationdesign}). Appendix~\ref{app:protocol} gives protocol details and hyperparameters.
+
+\subsection{Benchmark construction}\label{sec:benchmark}
+
+From the 450 datasets of the Penn Machine Learning Benchmarks (PMLB) \citep{olson2017pmlb}, an eligibility screen declared before any method was fitted (regression target, at least 80 complete observations, at least one continuous covariate, and at most 120 covariates) selected 243 tasks: 119 Feynman physics equations, 62 Friedman (FRI) synthetic benchmarks, 14 Strogatz dynamical systems, 3 FirstPrinciples physical laws, 2 Nikuradse fluid-mechanics datasets, and 43 general regression datasets. The 200 tasks generated by known formulas, physical laws, or synthetic generators form the \emph{mechanism track}, and the 43 general datasets form the \emph{tabular subset}; all 243 eligible tasks are reported. For each task, non-numeric entries were coerced, incomplete rows removed, and up to 300 complete rows sampled without replacement; all methods received the same rows and role partitions. Five covariate proxy strata were defined as quantile bins of the first raw feature, and the rows of each stratum were split into \(D_{\rm disc}\), \(D_{\rm diag}\), \(D_{\rm ver}\), \(D_{\rm cal}\), and \(D_{\rm test}\) in proportions \(0.40/0.15/0.15/0.15/0.15\). Feature screening (the eight covariates most correlated in absolute value with the discovery response, when more than eight exist) and z-score standardisation of features and target were fitted on \(D_{\rm disc}\) only.
+
+\paragraph{Public OpenML track} To test targets that are not drawn from a closed-form catalogue, a second track uses 15 public OpenML regression datasets \citep{vanschoren2013openml} (Table~\ref{tab:openml}), from which columns encoding alternative or target-derived labels were removed; each dataset yielded ten repeated 300-row subsamples with the same stratified five-role protocol and discovery-only preprocessing (150 dataset-partition instances).
+
+\subsection{Comparators and compute}\label{sec:comparators}
+
+We compare EIDOS with six SR methods, namely PySR \citep{cranmer2023pysr}, PSRN/PSE (parallel symbolic enumeration) \citep{ruan2026pse}, Operon \citep{burlacu2020operon}, AI-Feynman \citep{udrescu2020aifeynman}, PhySO \citep{tenachi2023physo}, and gplearn \citep{koza1992,stephens2015gplearn}, and with five non-symbolic methods: ridge regression (ERM ridge) \citep{hoerl1970ridge}, a multilayer perceptron (MLP), XGBoost \citep{chen2016xgboost}, LightGBM \citep{ke2017lightgbm}, and random forests \citep{breiman2001rf}. For parity of data access, every comparator received the same discovery-fitted transformations: initial fitting used only \(D_{\rm disc}\), hyperparameter selection only \(D_{\rm diag}\) (12, 8, 6, and 6 grid cells for XGBoost, LightGBM, random forests, and the MLP), the selected configuration was refitted on \(D_{\rm disc}\cup D_{\rm diag}\), and no method accessed the later roles before the final test evaluation (Appendices~\ref{app:comparators} and~\ref{app:settings}). Pretrained sequence-to-expression transformers and large-language-model SR generators \citep{kamienny2022e2e,shojaee2025llmsr} were excluded from the comparator set, because their pretrained weights encode external training corpora that this data-access protocol cannot control.
+
+All methods shared a per-fit wall-clock ceiling of \(200\)\,s. The six SR baselines, XGBoost, the MLP, and ERM ridge ran on a primary workstation, and EIDOS, LightGBM, and random forests on a secondary one (Appendix~\ref{app:comparators}), so runtime comparisons across workstations are indicative only. We report mean RMSE ranks over the tasks completed by every method \citep{demsar2006}, paired geometric-mean EIDOS/comparator test-RMSE ratios with 95\% source-clustered bootstrap confidence intervals on each table's specified task set (tasks derived from the same original data source, Appendix~\ref{app:protocol}, are resampled jointly), and Holm-adjusted two-sided Wilcoxon signed-rank \(p\)-values \citep{wilcoxon1945,holm1979} over all pairwise-complete tasks.
+
+\subsection{Leakage-detection study}\label{sec:leakdesign}
+
+To compare held-out error and replacement testing as detectors of isolation violations, we use 15 tasks (five known-form physical generators, five public-covariate tasks with formula-generated responses, and five synthetic stress tests; Appendix~\ref{app:leakage}), each with ten role partitions (150 task-partition entries). In the \emph{maximal} variant, \(D_{\rm cal}\) is merged into \(D_{\rm diag}\), so every step that reads \(D_{\rm diag}\) (tie-breaks (b)--(d), ridge tuning, sparse-union arbitration, and the final refit) accesses \(D_{\rm cal}\). In the \emph{graded} variants, candidate records \(m\in\mathcal M_C\) and ridge multipliers are ranked by
+\begin{equation}\label{eq:gradedkey}
+K_\lambda(m)=(1-\lambda)\,A(m)+\lambda\,B(m;D_{\rm cal}),\qquad \lambda\in\{0.00,0.01,0.05,0.10,0.25,1.00\},
+\end{equation}
+where \(\mathcal M_C=\{(T,\widehat e_{\rm sel}(T),\widehat q_{\rm sel}(T)):T\in\mathcal T_C\}\), \(A(m)\) is the compliant three-fold discovery cross-fit RMSE and \(B(m;D_{\rm cal})\) the RMSE of \(m\) on \(D_{\rm cal}\). Every \(\lambda>0\) violates clause (iii) of Definition~\ref{def:eidoscontract}; \(\lambda=0\) reproduces the compliant key and serves as a negative control.
+
+The \emph{predictive instrument} is the paired leaking-to-compliant test-RMSE ratio, the signal available to a maintainer who gates admission on held-out error. The \emph{structural instrument} is the replacement test of Definition~\ref{def:evidencechannel} applied to \(D_{\rm cal}\) with four strategies that preserve different statistical invariants (Appendix~\ref{app:leakage}): bootstrap resampling, response permutation, paired-row shuffling, and additive Gaussian response noise. In the graded study, payloads are compared at three nested granularities: (1) the \emph{model record} (emitted basis structure, ridge penalty, indices \(\widehat q_{\rm rep}\), and binary64 standardisation constants); (2) the record plus the full candidate ordering; and (3) the complete payload \(P\), which adds the score ledger. Per entry and weight, we run six bootstrap draws and two draws of each other strategy; with 288 additional control draws at \(\lambda=0\), this gives 11{,}088 reruns, and a further 2{,}250 reruns with diagnosis arbitration enabled cover \(\lambda\in\{0.00,0.01,0.10\}\). Three of the six bootstrap draws per entry estimate entry-wise three-draw detection, and the other three measure it.
+
+\subsection{Recovery, formula-record, and interval studies}\label{sec:recoverydesign}
+
+To assess exact structure identification independently of search limitations, we use five Feynman-inspired generators (harmonic oscillator, Lorentz-like saturation, relativistic velocity addition, Kepler-like power law, and a blackbody radiation proxy; hereafter Oscillator, Lorentz, Relativistic, Kepler, and Blackbody) at noise levels \(\sigma\in\{0.01,0.05,0.10,0.20,0.40,0.80,1.60,3.20\}\) with five seeds each. All runs select from one task-independent bank of 240 anonymised structures, so each generating law competes with 239 distractors. Levels \(\sigma\le0.80\) (150 runs) probe the standard regime and \(\sigma\in\{1.60,3.20\}\) the high-noise regime. We measure exact recovery, variable- and operator-set precision and recall, and the semantic normalised RMSE (NRMSE): the RMSE of the decoded refit against the noiseless generating function on \(D_{\rm test}\), divided by the standard deviation of the noiseless test response. For Oscillator, Lorentz, and Blackbody at \(\sigma=0.80\) (first seed), we also compare the expressions of EIDOS, PySR, and Operon fitted on identical construction data under the \(200\)\,s ceiling.
+
+Interval validity is assessed at nominal coverage \(1-\alpha=0.900\) in two arms of 25 runs, comparing pooled split-conformal and Mondrian intervals with nearest-stratum transfer under shift. In the \emph{exchangeable} arm, calibration and test rows come from all five proxy strata; in the \emph{unseen-group shift} arm, the highest stratum is reserved for \(D_{\rm test}\), which violates exchangeability. On the shifted arm we also report an auxiliary source-only \emph{proxy-trend envelope}, which extrapolates residual location and log-quantile trends across source strata via one-step source backtests, to illustrate how shift diagnostics can be archived alongside conformal certificates.
+
+\subsection{Ablation, protocol cost, and representation checks}\label{sec:ablationdesign}
+
+A cumulative ablation over the 243 catalogue tasks starts from a base configuration (a fixed \(10^{-3}\) grid and a hard residual-invariance filter at \(\alpha_{\rm inv}=0.05\)) and adds, in turn, the precision-matched grid, the invariance tie-break, the pairwise trigonometric family, the arbitrated sparse-union refit, and the monomial family. To isolate the cost of withholding certification data, EIDOS and XGBoost are evaluated on identical test rows (\(15\%\)) under three allocations of the remaining \(85\%\): the five-role protocol (\(55\%\) construction, \(15\%\) verification, \(15\%\) calibration); a \emph{compact} protocol in which verification and calibration share one \(15\%\) certification role (\(70\%\) construction); and a conventional split with all non-test rows used for construction (\(85\%\)). Finally, we verify replacement invariance on all 243 tasks and test interoperability by encoding, independently decoding, and re-encoding the six PySR and Operon expressions of the formula-record study on a \(10^{-8}\) grid.
+
+\FloatBarrier
+
+\section{Results}\label{sec:results}
+
+\subsection{Predictive performance and compute}\label{sec:predictiveresults}
+
+Table~\ref{tab:predictive} summarises the mechanism track. EIDOS has the best mean RMSE rank (\(2.14\)) and wins \(123\) of the \(194\) tasks completed by all methods, ahead of LightGBM (\(3.62\), \(17\) wins), XGBoost (\(4.83\)), and the strongest SR baseline, PySR (\(5.46\)). The geometric-mean EIDOS/comparator test-RMSE ratio ranges from \(0.162\) against LightGBM to \(0.081\) against gplearn, every 95\% confidence interval lies below one, and every Holm-adjusted Wilcoxon test gives \(p<10^{-5}\). Much of this margin comes from the raw-scale monomial family, whereas the SR baselines received standardised features only: restricted to those features, EIDOS still has the best mean rank (\(2.42\), ahead of LightGBM at \(3.58\)) and ratios of \(0.566\) (\(0.453\)--\(0.675\)) against LightGBM and \(0.556\) against PySR. EIDOS completes all 200 tasks; over the 243 catalogue tasks its median runtime is \(3.47\)\,s per task (maximum \(8.30\)\,s), between LightGBM (\(1.34\)\,s) and random forests (\(7.55\)\,s) on the same workstation and, as measured on the other workstation, below every SR baseline except Operon (\(2.01\)\,s).
+
+\begin{table*}[t]
+\def\baselinestretch{1}\selectfont
+\caption{Mechanism-track performance on 200 tasks (194 completed by all twelve methods). Mean rank, wins, and geometric-mean EIDOS/comparator test-RMSE ratios with 95\% source-clustered confidence intervals use the 194 complete tasks; Holm-adjusted Wilcoxon signed-rank \(p\)-values use all 195--200 pairwise-complete tasks. Median runtimes marked \(\dagger\) were measured on the secondary workstation over all 243 catalogue tasks; the others on the primary workstation.}\label{tab:predictive}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4.0pt}
+\renewcommand{\arraystretch}{1.06}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}Xrrlrrr@{}}
+\toprule
+\textbf{Method} & \shortstack{\textbf{Mean}\\\textbf{rank}} & \textbf{Wins} & \shortstack{\textbf{EIDOS/method}\\\textbf{(95\% CI)}} & \textbf{Holm \(p\)} & \textbf{Completed} & \shortstack{\textbf{Median}\\\textbf{s/task}} \\
+\midrule
+\textbf{EIDOS} & 2.14 & 123 & -- & -- & 200/200 & 3.47\(^\dagger\) \\
+LightGBM & 3.62 & 17 & 0.162 (0.079--0.268) & \(<10^{-5}\) & 200/200 & 1.34\(^\dagger\) \\
+XGBoost & 4.83 & 10 & 0.129 (0.060--0.225) & \(<10^{-5}\) & 200/200 & 2.28 \\
+Random forest & 5.20 & 8 & 0.135 (0.065--0.225) & \(<10^{-5}\) & 200/200 & 7.55\(^\dagger\) \\
+MLP & 5.35 & 18 & 0.148 (0.081--0.227) & \(<10^{-5}\) & 200/200 & 0.63 \\
+PySR & 5.46 & 9 & 0.158 (0.084--0.255) & \(<10^{-5}\) & 195/200 & 4.87 \\
+PSRN/PSE & 6.80 & 4 & 0.122 (0.062--0.196) & \(<10^{-5}\) & 195/200 & 82.28 \\
+Operon & 8.04 & 0 & 0.095 (0.046--0.159) & \(<10^{-5}\) & 199/200 & 2.01 \\
+ERM ridge & 8.42 & 2 & 0.085 (0.042--0.143) & \(<10^{-5}\) & 200/200 & 0.22 \\
+AI-Feynman & 9.29 & 0 & 0.082 (0.040--0.138) & \(<10^{-5}\) & 200/200 & 14.99 \\
+PhySO & 9.32 & 1 & 0.084 (0.042--0.139) & \(<10^{-5}\) & 195/200 & 285.86 \\
+gplearn & 9.53 & 2 & 0.081 (0.038--0.139) & \(<10^{-5}\) & 200/200 & 10.77 \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+Table~\ref{tab:family} stratifies the ratios by benchmark family. On Feynman, whose laws lie within or close to the span of the operator catalogue, EIDOS reduces error by more than an order of magnitude relative to the gradient-boosted trees and PySR (ratios \(0.042\)--\(0.060\)); on Strogatz the ratios are \(0.170\)--\(0.406\). On the noisy FRI and general Tabular tasks the lead is moderate (\(0.864\)--\(0.896\) against the gradient-boosted trees; \(0.691\) and \(0.846\) against PySR). On the five FirstPrinciples and Nikuradse tasks, which include supernova light curves with sharp localised peaks that a global algebraic dictionary cannot represent compactly, the gradient-boosted trees are more accurate (\(1.056\)--\(1.181\)), although EIDOS still outperforms PySR (\(0.819\)). This pattern suggests a dictionary projection floor: when the target has a small \(L^2\) residual after projection onto a low-dimensional symbolic dictionary, ridge estimation on \(d(T)-1\) bases from \(|S|\) fit-set observations estimates a compact coefficient vector, whereas a large projection residual favours adaptive trees. Consistently, over the 243 catalogue tasks the geometric-mean EIDOS/XGBoost ratio rises across quartiles of EIDOS's discovery cross-fit RMSE from \(0.004\) to \(0.350\), \(0.800\), and \(1.010\) (Spearman correlation \(0.855\) between cross-fit RMSE and the log ratio).
+
+\begin{table}[t]
+\def\baselinestretch{1}\selectfont
+\caption{Geometric-mean EIDOS/comparator test-RMSE ratio by benchmark family over the 243 catalogue tasks; each ratio uses the pairwise-complete tasks of the family. XGB and LGBM denote XGBoost and LightGBM.}\label{tab:family}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.0pt}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Family} & \textbf{Tasks} & \textbf{XGB} & \textbf{LGBM} & \textbf{PySR} \\
+\midrule
+Feynman & 119 & 0.042 & 0.055 & 0.060 \\
+FRI & 62 & 0.888 & 0.896 & 0.691 \\
+Strogatz & 14 & 0.170 & 0.363 & 0.406 \\
+FirstPrinc.+Nikuradse & 5 & 1.056 & 1.181 & 0.819 \\
+Tabular & 43 & 0.864 & 0.881 & 0.846 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:realtrack} reports the OpenML track, whose targets are not generated by closed-form expressions in \(C_0\). EIDOS has the lowest mean rank (\(3.01\), \(40\) instance wins), followed by LightGBM (\(3.36\)) and XGBoost (\(3.47\)), but its geometric-mean ratios against LightGBM (\(0.960\)), XGBoost (\(0.963\)), and random forests (\(0.882\)) are not significantly different from one (Wilcoxon signed-rank test on dataset means, \(p\ge0.360\)), so the rank order does not establish superiority over tree ensembles. EIDOS does outperform PySR (\(0.724\), 95\% CI \(0.554\)--\(0.894\), \(p=0.001\); better on \(13\) of \(15\) datasets, although PySR ran with a reduced budget on this track; Appendix~\ref{app:settings}), the MLP (\(0.706\)), and ERM ridge (\(0.664\)). On the 43 PMLB tabular tasks, EIDOS also has the best mean rank among the twelve methods (\(4.60\), ahead of random forests at \(4.77\)), although after Holm adjustment only gplearn, PhySO, PSRN/PSE, and AI-Feynman differ significantly from it. Where tree ensembles excel, EIDOS therefore offers competitive accuracy while emitting a closed-form, verifiable equation.
+
+\begin{table}[t]
+\def\baselinestretch{1}\selectfont
+\caption{Public OpenML track: 15 datasets with ten stratified role partitions each (150 instances). Ratios are geometric-mean EIDOS/comparator test RMSE with 95\% dataset-cluster bootstrap confidence intervals; ``Better'' counts the datasets (out of 15) on which EIDOS has the lower mean log RMSE. Differences from the tree ensembles are not significant (Wilcoxon signed-rank test on dataset means, \(p\ge0.360\)).}\label{tab:realtrack}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.0pt}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Method} & \textbf{Mean rank} & \textbf{Wins} & \textbf{EIDOS/method} & \textbf{Better} \\
+\midrule
+\textbf{EIDOS} & 3.01 & 40 & -- & -- \\
+LightGBM & 3.36 & 31 & 0.960 (0.785--1.118) & 10/15 \\
+XGBoost & 3.47 & 27 & 0.963 (0.794--1.123) & 10/15 \\
+Random forest & 3.58 & 12 & 0.882 (0.724--1.011) & 9/15 \\
+ERM ridge & 4.47 & 15 & 0.664 (0.461--0.914) & 11/15 \\
+MLP & 4.81 & 14 & 0.706 (0.525--0.912) & 12/15 \\
+PySR & 5.31 & 11 & 0.724 (0.554--0.894) & 13/15 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Component ablation and record size} Each cumulative addition in Table~\ref{tab:ablation} reduces the geometric-mean test RMSE (all 95\% confidence intervals below one): the precision-matched grid removes rounding floors on low-noise laws (Remark~\ref{rem:quantisation}); the invariance tie-break stops the scale-free MMD filter from rejecting accurate candidates; the pairwise trigonometric family covers coupled bilinear oscillations; the arbitrated sparse-union refit combines complementary basis terms; and the monomial family represents multiplicative power laws without polynomial approximation error. Together they reduce test RMSE to \(0.269\) (\(0.174\)--\(0.373\)) of the base configuration. The admitted records have a median of \(17\) basis terms; \(64\) of the \(243\) contain at most five terms, and \(39\) are monomial-family records, \(31\) of which consist of a single monomial term plus an intercept.
+
+\begin{table*}[t]
+\def\baselinestretch{1}\selectfont
+\caption{Cumulative component ablation over the 243 catalogue tasks: paired geometric-mean test-RMSE ratio of each configuration relative to the preceding one, with 95\% source-clustered confidence intervals and counts of improved/degraded tasks. The final row compares the full pipeline with the base configuration.}\label{tab:ablation}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.0pt}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Component added} & \textbf{Ratio (95\% CI)} & \textbf{Better/worse} \\
+\midrule
+Fixed \(10^{-3}\) grid \(\to\) precision-matched grid & 0.975 (0.934--0.998) & 112/100 \\
+Invariance filter \(\to\) invariance tie-break & 0.943 (0.899--0.979) & 36/17 \\
+\(+\) pairwise trigonometric family & 0.920 (0.882--0.953) & 45/9 \\
+\(+\) arbitrated sparse-union refit & 0.892 (0.855--0.928) & 106/34 \\
+\(+\) monomial family & 0.357 (0.234--0.487) & 72/8 \\
+\addlinespace[3pt]
+Full EIDOS vs.\ base configuration & 0.269 (0.174--0.373) & 180/57 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Structural versus predictive instruments under injected violations}\label{sec:leakresults}
+
+Propositions~\ref{prop:evidence}--\ref{prop:dominance} characterise the replacement test in principle; an ingestion system must also confirm that its implementation leaks no state and choose an instrument that catches violations. We therefore contrast the compliant pipeline (negative control) with pipelines that leak calibration data (positive controls).
+
+\paragraph{Maximal calibration leakage} Merging \(D_{\rm cal}\) into diagnosis does not raise held-out error; it \emph{lowers} test RMSE by a geometric-mean factor of \(0.980\) (95\% task-cluster CI \(0.959\)--\(0.997\)), because the leaked rows enlarge the sample for ridge tuning, arbitration, and refitting. A maintainer who gated admission on test error would thus prefer the leaking pipeline. The replacement test separates the two pipelines in all 150 entries: the compliant payload stays byte-identical under all four strategies, and the leaking payload changes in every entry within three draws per strategy. The changed fields locate the violation: because key (a) reads \(D_{\rm disc}\) only, the top-ranked discovery candidate is unchanged in all entries, but the emitted basis or ridge multiplier changes in \(149\) entries (the sparse-union decision flips in \(124\), the active support shifts in \(18\), and the ridge multiplier changes in \(7\)), and the indices \(\widehat q_{\rm rep}\) and standardisation constants change in the remaining one.
+
+\subsection{Graded violations, payload granularity, and the geometric law}\label{sec:gradedleak}
+
+Figure~\ref{fig:leakage} reports the results for the graded key of Eq.~\eqref{eq:gradedkey}. Single-draw sensitivity depends on what the payload commits (Figure~\ref{fig:leakage}(A)). Comparing only the model record, the single-draw bootstrap detection rate is \(0.014\) at \(\lambda=0.01\) and \(0.564\) at \(\lambda=1.00\) (\(0.097\) and \(1.000\) under the strongest non-bootstrap strategy). Adding the candidate ordering raises bootstrap detection to \(0.271\) and \(0.998\), because perturbing \(D_{\rm cal}\) reorders sub-optimal candidates even when the winner is unchanged. Committing the full score ledger yields single-draw detection of \(1.000\) at every \(\lambda\ge0.01\) and for every strategy across all \(9{,}000\) leaking reruns, while all \(2{,}088\) control reruns at \(\lambda=0\) leave every payload granularity unchanged.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.98\textwidth]{Figure_2.pdf}
+\caption{Graded calibration leakage over 15 tasks and ten role partitions (150 entries per weight \(\lambda\)). (A) Observed single-draw payload-change rate at the three nested payload granularities. (B) Detection within \(t=3\) bootstrap draws for the model-record payload: observed three-draw detection rate, entry-wise prediction estimated from three other independent draws, and pooled plug-in \(1-(1-\bar\pi)^3\). (C) Paired leaking/compliant test-RMSE ratio and the proportion of entries in which both pipelines give identical test RMSE.}\label{fig:leakage}
+\end{figure*}
+
+Without a ledger, detection accumulates over draws as in Proposition~\ref{prop:replacementpower}(ii), and planning must account for heterogeneity across entries (Figure~\ref{fig:leakage}(B)). Three-draw detection of the model record, estimated entry by entry from three bootstrap draws, agrees with the rate observed on three further draws (mean absolute error \(0.028\), maximum \(0.060\), over \(\lambda\in[0.01,1.00]\)), whereas plugging the pooled rate \(\bar\pi\) into \(1-(1-\bar\pi)^3\) overestimates detection at every \(\lambda\ge0.05\), by up to \(0.129\), as Jensen's inequality predicts when \(\pi_w\) varies across entries (Theorem~\ref{thm:mixture}). The committed ledger detected every replacement in this experiment.
+
+Held-out error, by contrast, is essentially insensitive to graded leakage (Figure~\ref{fig:leakage}(C)): the paired leaking/compliant geometric-mean test-RMSE ratio stays within \(0.993\)--\(1.000\) for \(\lambda\in[0.01,1.00]\). The two pipelines give identical test RMSE in \(97.3\%\) of entries at \(\lambda=0.01\), \(86.0\%\) at \(0.05\), \(78.7\%\) at \(0.10\), \(64.0\%\) at \(0.25\), and \(30.7\%\) even at \(\lambda=1.00\); for these entries, test RMSE cannot reveal that \(D_{\rm cal}\) was read during selection (Proposition~\ref{prop:dominance}), whereas the ledger exposes the violation in one rerun.
+
+With diagnosis arbitration enabled (\(\lambda\in\{0.00,\allowbreak0.01,\allowbreak0.10\}\); \(2{,}250\) reruns), no payload changed in the \(750\) control reruns and the ledger detected all \(1{,}500\) leaking reruns; no payload changed either when \(D_{\rm ver}\), \(D_{\rm cal}\), and \(D_{\rm test}\) were jointly permuted and perturbed for all 243 catalogue tasks. Across the whole study, the replacement test raised no false alarm in \(4{,}881\) negative-control reruns (\(1{,}800\) compliant reruns in the maximal-leakage comparison, \(2{,}088\) and \(750\) in the graded studies, and \(243\) catalogue reruns), consistent with reproducible-build conformance of our implementation.
+
+\subsection{Equation recovery}\label{sec:recoveryresults}
+
+For \(\sigma\le0.80\) (150 runs), EIDOS recovers the exact generating structure in every run for all five generators, with variable- and operator-set precision and recall of \(1.000\) (Figure~\ref{fig:recoverydiagnostics}(A,B)): within a declared candidate class, the cross-fit-first rule isolates the true form from 239 distractors without heavy complexity weights. For \(\sigma\in\{1.60,3.20\}\), recovery degrades in a mechanism-dependent order; at \(\sigma=3.20\) it is \(5/5\) for Blackbody, \(3/5\) for Lorentz, \(2/5\) for Relativistic, whose rational denominator is masked by the noise, \(1/5\) for Kepler, and \(0/5\) for Oscillator. Operator-set precision nevertheless remains at or above \(0.980\) while recall falls to \(0.923\): under heavy noise, EIDOS drops weakly identified terms rather than adding spurious operators, a pattern of operator omission.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{Figure_3.pdf}
+\caption{Equation recovery and conformal interval validity. (A) Exact generating-structure recovery rate versus noise standard deviation \(\sigma\in[0.01,3.20]\) for the five generators. (B) Mean operator-set precision and recall across generators versus \(\sigma\). (C) Observed marginal coverage of pooled split-conformal intervals, Mondrian intervals with nearest-stratum transfer under shift, and the source-only proxy-trend envelope at nominal level \(0.900\) under the exchangeable and unseen-group shift regimes (error bars: 95\% confidence intervals over 25 runs).}\label{fig:recoverydiagnostics}
+\end{figure*}
+
+\subsection{Interval validity}\label{sec:intervalresults}
+
+On the exchangeable arm (Figure~\ref{fig:recoverydiagnostics}(C)), pooled split-conformal intervals attain a mean coverage of \(0.905\) (mean width \(4.622\)) and Mondrian intervals \(0.915\) (\(5.348\)), consistent with Proposition~\ref{prop:conformal}. Under unseen-group shift, pooled coverage drops to \(0.728\) (width \(3.627\)) because residual scale grows in the uncalibrated region; nearest-stratum transfer intervals reach \(0.841\) (\(5.250\)), and the source-only proxy-trend envelope attains \(0.942\) at \(1.685\) times the transfer-interval width. Isolation guarantees that \(D_{\rm cal}\) never influenced fitting, whereas the archived calibration certificate records the assumptions under which finite-sample coverage holds.
+
+\subsection{Illustrative equation records}\label{sec:casestudies}
+
+Table~\ref{tab:formulaexamples} compares the expressions obtained at \(\sigma=0.80\) for three operator-diverse laws. EIDOS recovers the generating operator structure in all three cases and attains the lowest semantic NRMSE. For Oscillator, it keeps both trigonometric channels and the linear \(x_3\) term (\(0.083\)), whereas PySR collapses the law into a single modulated sine (\(0.414\)) and Operon replaces \(\sin(1.10x_1)\) and \(\cos(x_2)\) by linear terms plus an off-frequency cosine (\(0.144\)). For Lorentz, EIDOS recovers the rational bilinear form (\(0.038\)), whereas PySR substitutes a trigonometric ratio (\(0.278\)) and Operon a doubly nested exponential (\(0.054\)) that obscures the saturation law. For Blackbody, EIDOS preserves the cubic scaling, the clipped Bose--Einstein denominator, and the additive \(x_3\) term (\(0.005\)), whereas PySR and Operon reach \(0.019\) with a rational approximation that drops \(x_3\). EIDOS benefits here from a declared bank that contains the generating forms, but the comparison illustrates a curation risk: low error can come from algebraically opaque surrogates, whereas EIDOS archives mechanism-preserving equations as exact, bit-reconstructible records.
+
+\begin{table*}[t]
+\def\baselinestretch{1}\selectfont
+\caption{Displayed closed-form expressions at noise level \(\sigma=0.80\) (first seed; decoded coefficients shown to three significant figures, or to three decimal places for magnitudes below 0.1). Semantic NRMSE is evaluated against the noiseless ground-truth response on \(D_{\rm test}\).}\label{tab:formulaexamples}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{1.13}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.09\textwidth}>{\raggedright\arraybackslash}Xr@{}}
+\toprule
+\textbf{Case} & \textbf{Method} & \textbf{Selected or generating formula} & \textbf{Semantic NRMSE} \\
+\midrule
+Oscillator & Truth & \(2.20\sin(1.10x_1)+0.800\cos(x_2)-0.200x_3\) & -- \\
+& EIDOS & \(-0.080+2.21\sin(1.10x_1)+0.918\cos(x_2)-0.241x_3\) & 0.083 \\
+& PySR & \((3.54-x_2)\sin(x_1)\) & 0.414 \\
+& Operon & \(3.26-0.618x_1-0.764x_2-0.269x_3-1.11\cos(1.81x_1)\) & 0.144 \\
+\addlinespace
+Lorentz-like & Truth & \(x_1x_2/(1+x_3^2)\) & -- \\
+& EIDOS & \(-0.045+1.00x_1x_2/(1+x_3^2)\) & 0.038 \\
+& PySR & \(x_1\sin(x_2\sin x_3)/x_3\) & 0.278 \\
+& Operon & \(-0.009+0.066x_1x_2\exp[\exp\{\cos(0.829x_3)\}]\) & 0.054 \\
+\addlinespace
+Blackbody proxy & Truth & \(x_1^3/[\exp\{\operatorname{clip}(x_2,0,5)\}-1+0.01]+0.050x_3\) & -- \\
+& EIDOS & \(-0.083+1.00x_1^3/[\exp\{\operatorname{clip}(x_2,0,5)\}-1+0.01]+0.007x_3\) & 0.005 \\
+& PySR & \(x_1^3(0.920/x_2-0.318)\) & 0.019 \\
+& Operon & \(-0.096+x_1^3(0.920/x_2-0.315)\) & 0.019 \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\subsection{Representation checks and the cost of the role protocol}\label{sec:representationchecks}
+
+\paragraph{Coefficient quantisation} Over the 243 catalogue tasks, the ratio of quantised-record to full-precision test RMSE has a geometric mean of \(1.000\) and a maximum of \(1.003\) under the precision-matched grid, compared with a maximum of \(1.268\) under a fixed \(10^{-3}\) step.
+
+\paragraph{External-generator interoperability} Encoding the six PySR and Operon expressions of Section~\ref{sec:casestudies} in the EIDOS record format (\(10^{-8}\) grid), decoding them with an independent decoder, and re-encoding them reproduced all six payloads byte for byte, with a maximum absolute prediction discrepancy of \(4.75\times10^{-6}\) from the native floating-point expressions; the representation channel can therefore archive equations produced by external SR engines.
+
+\paragraph{Data-allocation cost} Withholding \(D_{\rm ver}\) and \(D_{\rm cal}\) reduces the construction fraction from \(85\%\) (a conventional \(85/15\) split) to \(55\%\). On identical test rows across the 200 mechanism tasks (Table~\ref{tab:protocolcost}), moving from the five-role to the conventional allocation gives paired test-RMSE ratios of \(0.898\) (\(0.827\)--\(0.987\)) for EIDOS and \(0.844\) (\(0.816\)--\(0.868\)) for XGBoost; because XGBoost gains more from the extra rows, the cost reflects generic sample-size scaling rather than an EIDOS-specific overhead. The compact allocation raises construction data to \(70\%\) while preserving replacement invariance and split-conformal coverage, because the shared certification role enters neither Eq.~\eqref{eq:selectionmap} nor any admission gate (Propositions~\ref{prop:evidence} and~\ref{prop:conformal}); the conventional-to-compact ratio for EIDOS is then \(0.960\) (\(0.902\)--\(1.019\)), a \(4.2\%\) excess RMSE. Even under the five-role protocol, EIDOS attains \(0.153\) (\(0.073\)--\(0.261\)) times the test RMSE of XGBoost trained conventionally on \(85\%\) of rows (\(0.143\) under the compact protocol).
+
+\begin{table*}[t]
+\def\baselinestretch{1}\selectfont
+\caption{Data-allocation cost of the isolation protocol on identical test sets \(D_{\rm test}\) across the 200 mechanism tasks (raw target units; geometric-mean test-RMSE ratios with 95\% source-clustered confidence intervals). The first three rows compare construction allocations (\(85\%\) conventional, \(70\%\) compact, \(55\%\) five-role) within each method; the last two compare EIDOS under the isolated allocations with XGBoost trained conventionally on \(85\%\) of the data.}\label{tab:protocolcost}
+\centering\scriptsize
+\setlength{\tabcolsep}{3.0pt}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Allocation contrast} & \textbf{EIDOS} & \textbf{XGBoost} \\
+\midrule
+Conventional (\(85\%\)) / five-role (\(55\%\)) & 0.898 (0.827--0.987) & 0.844 (0.816--0.868) \\
+Compact (\(70\%\)) / five-role (\(55\%\)) & 0.935 (0.867--1.023) & 0.921 (0.893--0.944) \\
+Conventional (\(85\%\)) / compact (\(70\%\)) & 0.960 (0.902--1.019) & 0.917 (0.899--0.934) \\
+\addlinespace[3pt]
+EIDOS five-role (\(55\%\)) / XGBoost conventional (\(85\%\)) & \multicolumn{2}{c}{0.153 (0.073--0.261)} \\
+EIDOS compact (\(70\%\)) / XGBoost conventional (\(85\%\)) & \multicolumn{2}{c}{0.143 (0.070--0.240)} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\paragraph{Residual verification diagnostic} Across the 200 mechanism tasks, the permutation MMD diagnostic on \(D_{\rm ver}\) flags \(49\) EIDOS records (\(24.5\%\)) at \(p<0.05\), the lowest rate among the ten methods for which it was recorded (\(35.5\%\)--\(57.0\%\) for the comparators); archiving it points maintainers to covariate regions with structured approximation residuals without discarding accurate equations.
+
+\section{Discussion and conclusion}\label{sec:discussion}
+
+\subsection{Implications for expert-system practice}
+
+Admitting a machine-discovered equation into an expert system requires representational identifiability and evidential traceability, neither of which held-out error certifies: graded selection leakage left test RMSE essentially unchanged, and leaking calibration rows into refitting lowered it. Isolation must therefore be enforced architecturally and tested by execution. In an ingestion service, each proposed rule is archived with the frozen contexts \((C_0,C)\), the role manifest, and the payload \(P\), each bound by its SHA-256 digest, together with the verification, calibration, and test certificates. Ledger collision mass determines rerun sensitivity to calibration-dependent keys (Theorem~\ref{thm:ledger}); for black-box components without a ledger, Proposition~\ref{prop:replacementpower}(ii) gives the rerun count for a target detection probability. Whenever an archived rule is re-examined or updated, checks R1--R3 verify its vocabulary provenance, score-to-decoder identity, and isolation without the original analysts, and when data are scarce a shared certification role keeps the allocation cost at a \(4.2\%\) excess RMSE while preserving the formal guarantees.
+
+\subsection{Limitations}\label{sec:limitations}
+
+Theorem~\ref{thm:jointkraft} and Proposition~\ref{prop:reconstruction} hold relative to \((C_0,C)\), the construction covariates, and the archived computing platform; algebraic equivalence across reparameterisations and cross-platform bit identity are outside their scope. The replacement test is a dynamic self-composition check (Proposition~\ref{prop:replacementpower}(iii)): it certifies payload invariance over the support of the applied replacement distributions, not the static absence of memory reads, and it cannot detect edits to \(C_0\) made before freezing, so it complements rather than replaces code review and role access control. Single-draw ledger detection requires that a violation affect at least one recorded key; leakage that bypasses the ledger is detected only through changes in the emitted record, at the multi-draw rate of Proposition~\ref{prop:replacementpower}(ii).
+
+Empirically, the evaluation targets up to 300 observations and eight screened features, the regime for which bounded enumeration and exact ridge refitting are designed. The largest gains occur on physics-derived tasks whose laws lie near the span of the operator catalogue; on general tabular data the advantage over tree ensembles is small or absent, and tree ensembles remain superior on targets with sharp localised transients. The sparse-union refit trades parsimony for accuracy (median \(17\) basis terms), which can limit human readability. All comparators received discovery-standardised inputs, which may obscure multiplicative structure for the SR baselines; AI-Feynman and PhySO ran under the shared \(200\)\,s ceiling rather than their much longer native budgets, PySR used a reduced \(120\)\,s budget on the OpenML track, and runtimes measured on different workstations are only indicative. Finally, the proxy-trend envelope restores empirical coverage under unseen-group shift, but distribution-free finite-sample guarantees hold only under exchangeability (Proposition~\ref{prop:conformal}).
+
+\subsection{Conclusion and future work}\label{sec:conclusion}
+
+EIDOS connects symbolic regression with knowledge-base engineering by ensuring that every admitted record is finitely decodable, Kraft-valid, and tested against post-selection leakage by byte-level replacement, at a median cost of \(3.47\)\,s per task and with accuracy that exceeds every evaluated SR baseline and is competitive with gradient-boosted trees. Future work will wrap stochastic evolutionary and neural generators in deterministic replay containers, combine admitted closed-form rules with certified nonparametric residual models for localised phenomena, extend representation-complete coding to high-dimensional, multivariate, and censored responses, and deploy automated R1--R3 re-verification in longitudinal knowledge-base maintenance.

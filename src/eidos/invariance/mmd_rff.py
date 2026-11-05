@@ -37,7 +37,16 @@ def mmd_rff_stat(
     seed: int = 0,
 ) -> float:
     phi = _rff_features(z=z, n_features=n_features, seed=seed)
+    return _mmd_rff_stat_from_features(phi=phi, env=env)
+
+
+def _mmd_rff_stat_from_features(phi: np.ndarray, env: np.ndarray) -> float:
+    """Compute the environment mean-discrepancy for one fixed feature map."""
+
+    phi = np.asarray(phi, dtype=float)
     env = np.asarray(env)
+    if phi.shape[0] != env.shape[0]:
+        raise ValueError("phi and env must have the same number of observations.")
     uniq = np.unique(env)
     if uniq.size <= 1:
         return 0.0
@@ -63,7 +72,8 @@ def mmd_rff_permutation_test(
     blocks = None if permute_blocks is None else np.asarray(permute_blocks)
     if blocks is not None and blocks.shape[0] != env.shape[0]:
         raise ValueError("permute_blocks must have the same length as env.")
-    observed = mmd_rff_stat(z=z, env=env, n_features=n_features, seed=seed)
+    phi = _rff_features(z=z, n_features=n_features, seed=seed)
+    observed = _mmd_rff_stat_from_features(phi=phi, env=env)
     ge = 1
     for _ in range(n_perm):
         if blocks is None:
@@ -75,7 +85,7 @@ def mmd_rff_permutation_test(
                 if idx.size <= 1:
                     continue
                 perm[idx] = rng.permutation(perm[idx])
-        stat = mmd_rff_stat(z=z, env=perm, n_features=n_features, seed=seed + 1)
+        stat = _mmd_rff_stat_from_features(phi=phi, env=perm)
         if stat >= observed:
             ge += 1
     pval = ge / (n_perm + 1)

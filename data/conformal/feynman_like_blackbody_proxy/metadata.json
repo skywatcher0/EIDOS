@@ -1,0 +1,31 @@
+{
+  "dataset_id": "feynman_like_blackbody_proxy",
+  "family": "B",
+  "n_samples": 1900,
+  "n_features": 3,
+  "n_envs": 5,
+  "delta_y": 0.0050000000000000044,
+  "delta_y_source": "synthetic",
+  "columns": [
+    "sample_id",
+    "env_id",
+    "split",
+    "x1",
+    "x2",
+    "x3",
+    "y_tilde"
+  ],
+  "units": {
+    "x1": {
+      "Nu": 1.0
+    },
+    "x2": {},
+    "x3": {},
+    "y_tilde": {
+      "Nu": 3.0
+    }
+  },
+  "env_rule": "env_id varies sampling range/noise; equation mechanism fixed; env max as unseen test env",
+  "source": "MIT Feynman inspired symbolic equations (subset simulation)",
+  "seed": 20260329
+}

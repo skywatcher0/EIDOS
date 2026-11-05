@@ -1,0 +1,16 @@
+dataset,openml_id,target,rows,features,dropped
+yacht_hydrodynamics,42370,Residuary.resistance,308,6,
+concrete_strength,44959,strength,1030,8,
+airfoil_self_noise,43919,pressure,1503,5,
+energy_efficiency_heating,43918,Y1,768,8,Y2
+kin8nm,189,y,8192,8,
+wine_quality,287,quality,6497,11,
+superconductivity,44964,critical_temp,21263,81,
+qsar_fish_toxicity,44970,LC50,908,6,
+protein_physicochemical,44963,RMSD,45730,9,
+naval_propulsion_compressor,44969,gt_compressor_decay_state_coefficient,11934,14,gt_turbine_decay_state_coefficient
+grid_stability,44973,stab,10000,12,stabf
+california_housing,43939,median_house_value,20640,7,
+space_ga,507,ln(VOTES/POP),3107,6,
+pumadyn32nh,44981,thetadd6,8192,32,
+abalone,183,Class_number_of_rings,4177,7,

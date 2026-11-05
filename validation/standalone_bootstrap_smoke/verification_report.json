@@ -1,0 +1,223 @@
+{
+  "checks": [
+    {
+      "check": "successful_rows",
+      "failures": 0,
+      "passed": true,
+      "rows": 2,
+      "suite": "benchmark"
+    },
+    {
+      "check": "reference_keys",
+      "passed": true,
+      "suite": "benchmark"
+    },
+    {
+      "atol": 1e-05,
+      "check": "rmse",
+      "matched": 2,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 2,
+      "strict_passed": true,
+      "suite": "benchmark",
+      "total": 2
+    },
+    {
+      "atol": 1e-08,
+      "check": "coverage",
+      "matched": 2,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 2,
+      "strict_passed": true,
+      "suite": "benchmark",
+      "total": 2
+    },
+    {
+      "atol": 1e-05,
+      "check": "interval_length",
+      "matched": 2,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 2,
+      "strict_passed": true,
+      "suite": "benchmark",
+      "total": 2
+    },
+    {
+      "atol": 1e-08,
+      "check": "p_inv_lock",
+      "matched": 2,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 2,
+      "strict_passed": true,
+      "suite": "benchmark",
+      "total": 2
+    },
+    {
+      "check": "candidate_id",
+      "matched": 2,
+      "passed": true,
+      "suite": "benchmark",
+      "total": 2
+    },
+    {
+      "check": "record_prediction_roundtrip",
+      "passed": true,
+      "suite": "benchmark"
+    },
+    {
+      "check": "replacement_invariance",
+      "passed": true,
+      "passed_tasks": 2,
+      "suite": "benchmark",
+      "tasks": 2
+    },
+    {
+      "check": "successful_rows",
+      "failures": 0,
+      "passed": true,
+      "rows": 1,
+      "suite": "openml"
+    },
+    {
+      "check": "reference_keys",
+      "passed": true,
+      "suite": "openml"
+    },
+    {
+      "atol": 1e-08,
+      "check": "rmse",
+      "matched": 1,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 1,
+      "strict_passed": true,
+      "suite": "openml",
+      "total": 1
+    },
+    {
+      "check": "record_prediction_roundtrip",
+      "passed": true,
+      "suite": "openml"
+    },
+    {
+      "check": "successful_rows",
+      "failures": 0,
+      "passed": true,
+      "rows": 3,
+      "suite": "recovery"
+    },
+    {
+      "check": "reference_keys",
+      "passed": true,
+      "suite": "recovery"
+    },
+    {
+      "atol": 1e-08,
+      "check": "semantic_nrmse",
+      "matched": 3,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 3,
+      "strict_passed": true,
+      "suite": "recovery",
+      "total": 3
+    },
+    {
+      "atol": 1e-08,
+      "check": "rmse_test",
+      "matched": 3,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 3,
+      "strict_passed": true,
+      "suite": "recovery",
+      "total": 3
+    },
+    {
+      "check": "selected_candidate_id",
+      "matched": 3,
+      "passed": true,
+      "suite": "recovery",
+      "total": 3
+    },
+    {
+      "check": "recovered",
+      "matched": 3,
+      "passed": true,
+      "suite": "recovery",
+      "total": 3
+    },
+    {
+      "check": "record_prediction_roundtrip",
+      "passed": true,
+      "suite": "recovery"
+    },
+    {
+      "check": "successful_rows",
+      "failures": 0,
+      "passed": true,
+      "rows": 5,
+      "suite": "conformal"
+    },
+    {
+      "check": "reference_keys",
+      "passed": true,
+      "suite": "conformal"
+    },
+    {
+      "atol": 1e-08,
+      "check": "observed_coverage",
+      "matched": 5,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 5,
+      "strict_passed": true,
+      "suite": "conformal",
+      "total": 5
+    },
+    {
+      "atol": 1e-08,
+      "check": "mean_interval_length",
+      "matched": 5,
+      "max_abs_difference": 9.237055564881302e-14,
+      "passed": true,
+      "rtol": 1e-05,
+      "strict_atol": 1e-08,
+      "strict_matched": 5,
+      "strict_passed": true,
+      "suite": "conformal",
+      "total": 5
+    },
+    {
+      "check": "selected_candidate_id",
+      "matched": 5,
+      "passed": true,
+      "suite": "conformal",
+      "total": 5
+    }
+  ],
+  "note": "Timing is excluded. Smoke checks only selected cells. PMLB RMSE/width allow 1% of the 0.001 response bin (atol=1e-5); strict atol=1e-8 matches and differences remain visible. Other metrics retain atol=1e-8.",
+  "passed": true,
+  "scope": "smoke",
+  "source_config_sha256": "e4e5342d2e57069c7ccaad4983cd3c306ef52b856356ad34f8035b042e0071d6"
+}

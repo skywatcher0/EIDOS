@@ -1,0 +1,152 @@
+[
+  {
+    "file": "experiments/interval_core/__init__.py",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/canon/semhash.py",
+    "original_sha256": "22269c1200ac803945a8698899824739ed49279fdfdba4f070407e1d295d23df",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/canon/syn.py",
+    "original_sha256": "901db88af466d06815382a73a6bdf4292bea222daa7d60a02aa409ff9b680a94",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/canon/__init__.py",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/conformal/split_cp.py",
+    "original_sha256": "0553da8cdf11f263c25936818782b79abccabb37f12a802c5bacfd547a39e43b",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/conformal/weighted_cp.py",
+    "original_sha256": "0562f63207df873cf2d189971c99d07160baad018251b71b08dd90314035ff69",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/conformal/__init__.py",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/dsl/domain_safety.py",
+    "original_sha256": "c27ca7e3ba53df511950e6387ab0860190b991af87cb551ec45a2e062a7fe97a",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/dsl/grammar.py",
+    "original_sha256": "a353551d72af502011cfc4016bfe7d6ef7a8c1b669aaddd66f02ceb397b44fbc",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/dsl/types_units.py",
+    "original_sha256": "b40e10b59d3e298f33e7fb97ad41fc429ddc20a5bddf5244f71fe34512fde119",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/dsl/__init__.py",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/evaluation/recovery.py",
+    "original_sha256": "4bf8c8c96b78907152998d3cf83a5439184cc0cbf100117a2fbb929297f3a760",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/evaluation/__init__.py",
+    "original_sha256": "0ee08a9cb55d91bafb614eb75fe09ace72a7ecc9046d78898efcd50eb86cf376",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/invariance/crossfit.py",
+    "original_sha256": "477bc436a538feea1aae051a2efc7ab323341480387e94cde13d5b212a2926fa",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/invariance/hsic.py",
+    "original_sha256": "75cfe308ded191023c0d70b4a5280a711721af8f02df72c6303ecf71f9933aee",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/invariance/mmd_rff.py",
+    "original_sha256": "391df54d30a79efc065599a8405ad055b6fc33590ff8e2a76809cd419ce63f11",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/invariance/permutation.py",
+    "original_sha256": "49cb8c736ac03188af510c56dd1ca0f93016c3c1f5fa20c1752e138667c5b497",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/invariance/residual_normalization.py",
+    "original_sha256": "bc616ba5d85f9dbf51ee4935013b3cb43a264cd8a17fdbbe401e791f76deec39",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/invariance/__init__.py",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/mdl/data_code.py",
+    "original_sha256": "93d4d6f430c992d8e3de9d8fb912d6e28d807c8e468f1f11b271544e603a1cf9",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/mdl/fisher_code.py",
+    "original_sha256": "59e6a746a1b69bf635d702296e47106c048a2e63b0ea76dc1d2373218c27efe7",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/mdl/param_code.py",
+    "original_sha256": "f32097fb5072d953e2429f940ad4d6765b3d598520b487126626b7703fb9e2a5",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/mdl/struct_code.py",
+    "original_sha256": "2348fcdc58704c2e8506be36cc3f5a3c20831fc3962a7e404fd2bd9e6535f32e",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/mdl/total.py",
+    "original_sha256": "6e6e7f4227fe9d7ea5520953deebc5dcf8fc595091a79fa3069cde587e720abe",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/mdl/__init__.py",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/protocol/strict.py",
+    "original_sha256": "4e0e81aaf71d5d6cfa821557a835546d2476bdc958a88e962a1b70e75483cc78",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/protocol/__init__.py",
+    "original_sha256": "d0593d8bf040d61dc73bf2ddaa8a17c86510e8c61ca096a6846a297f503341e1",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/search/engine.py",
+    "original_sha256": "ccd616d32b91f37dc89afad364ccce68ad9698878e827414071ebf881fd9ed9b",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/interval_core/search/models.py",
+    "original_sha256": "66b74ae340be3d1bbf178f8b3bdc1343fa4e503f7e622b5dde3606805560f076",
+    "modification": "internal imports renamed to experiments.interval_core; numerical algorithm unchanged"
+  },
+  {
+    "file": "experiments/recovery.py",
+    "original_sha256": "9c4c97cc60df044ef4a42faae961918f27282391a976c8069eed3c4bdb2eef49",
+    "modification": "remove old command-line main; add optional observation-only candidate ledger"
+  }
+]

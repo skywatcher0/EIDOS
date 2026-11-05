@@ -33,7 +33,9 @@ from src.eidos.search.models import (
     adaptive_trig_candidate_library,
     default_candidate_library,
     physics_template_candidate_library,
+    powerlaw_candidate_library,
     structural_boost_candidate_library,
+    trig_pair_candidate_library,
 )
 from src.utils.ledger import LedgerWriter
 
@@ -67,6 +69,7 @@ class EngineResult:
     test_pred: np.ndarray | None = None
     test_lower: np.ndarray | None = None
     test_upper: np.ndarray | None = None
+    selection_trace: dict[str, Any] | None = None
 
 
 @dataclass
@@ -756,6 +759,221 @@ def _build_concept_augmented_specs(
     return out
 
 
+def _elias_gamma_bits(n: int) -> int:
+    value = int(n)
+    if value < 1:
+        raise ValueError("Elias-gamma coding requires an integer n >= 1")
+    return 2 * (value.bit_length() - 1) + 1
+
+
+def _matched_precision_step(
+    model: LinearBasisModel,
+    x_fit: np.ndarray,
+    y_fit: np.ndarray,
+    base_step: float,
+    kappa: float,
+    max_exponent: int,
+) -> tuple[float, int, float]:
+    """Coarsest decimal grid step whose quantisation bound is small against the fit residual.
+
+    The fitting map standardises every non-constant basis column, so rounding the
+    coefficients to a grid of step ``h`` moves the fit-set predictions by at most
+    ``d * h / 2`` in root-mean-square (Remark 1).  The record keeps the declared base
+    step unless that bound exceeds ``kappa`` times the full-precision fit-set RMSE, in
+    which case the grid is refined by decades.  The step is a deterministic function
+    of the fit set, and its exponent offset is transmitted with an Elias-gamma code,
+    so the record stays prefix-decodable and evidence-isolated.
+    Returns ``(step, exponent_offset, exponent_code_bits)``.
+    """
+
+    base_exponent = int(round(-np.log10(float(base_step))))
+    mu_fit, _ = model.predict_mu_sigma(x_fit)
+    resid_rms = float(np.sqrt(np.mean((np.asarray(y_fit, dtype=float) - mu_fit) ** 2)))
+    n_basis = max(1, len(model.spec.basis_exprs))
+    exponent = base_exponent
+    while exponent < int(max_exponent) and n_basis * (10.0 ** -exponent) / 2.0 > float(kappa) * resid_rms:
+        exponent += 1
+    offset = exponent - base_exponent
+    return float(10.0 ** -exponent), offset, float(_elias_gamma_bits(offset + 1))
+
+
+class _GridFoldModel(LinearBasisModel):
+    """Cross-fitting fold model that is put on the declared grid before it predicts."""
+
+    def __init__(
+        self,
+        spec: CandidateSpec,
+        feature_cols: list[str],
+        ridge: float,
+        device: str,
+        base_step: float,
+        kappa: float | None,
+        max_exponent: int,
+    ) -> None:
+        super().__init__(spec, feature_cols, ridge=ridge, device=device)
+        self._base_step = float(base_step)
+        self._kappa = kappa
+        self._max_exponent = int(max_exponent)
+
+    def fit(self, x: np.ndarray, y: np.ndarray, env: np.ndarray | None = None) -> "_GridFoldModel":
+        super().fit(x, y, env=env)
+        step = self._base_step
+        if self._kappa is not None:
+            step, _, _ = _matched_precision_step(self, x, y, self._base_step, self._kappa, self._max_exponent)
+        self.set_param_vector(quantize_parameters(self.param_vector(), steps=step).values)
+        return self
+
+
+def _stack_weights(z: np.ndarray, y: np.ndarray, step: float = 1e-3, convex: bool = False) -> np.ndarray:
+    """Aggregation weights on out-of-sample predictions, on a grid.
+
+    ``convex=False`` is Breiman's non-negative least squares; ``convex=True`` normalises the
+    non-negative solution to sum to one, so the stacked prediction lies pointwise in the
+    convex hull of the component predictions and, by Jensen's inequality, its squared error
+    never exceeds the weighted average of the component squared errors.
+    """
+    from scipy.optimize import nnls
+
+    weights, _ = nnls(np.asarray(z, dtype=float), np.asarray(y, dtype=float))
+    if convex and weights.sum() > 0.0:
+        weights = weights / weights.sum()
+    weights = np.floor(weights / step + 0.5) * step
+    if not np.any(weights > 0.0):
+        weights = np.zeros(z.shape[1])
+        weights[0] = 1.0
+    return weights
+
+
+def _combine_linear_records(
+    models: list[LinearBasisModel],
+    weights: np.ndarray,
+    feature_cols: list[str],
+    device: str,
+    candidate_id: str,
+    x_fit: np.ndarray,
+    y_fit: np.ndarray,
+) -> LinearBasisModel:
+    """Express sum_k w_k * model_k exactly as one linear record over the union basis.
+
+    Every component is fitted on the same rows, so a basis expression shared by two
+    components has the same standardisation constants and the coefficients add.
+    """
+    exprs: list[Expr] = []
+    means: list[float] = []
+    stds: list[float] = []
+    coefs: list[float] = []
+    index: dict[tuple[str, str, str], int] = {}
+    for model, weight in zip(models, weights, strict=True):
+        if weight == 0.0:
+            continue
+        for expr, mean_j, std_j, theta in zip(
+            model.spec.basis_exprs, model.phi_mean.reshape(-1), model.phi_std.reshape(-1), model.w, strict=True
+        ):
+            key = (expr.to_string(), float(mean_j).hex(), float(std_j).hex())
+            if key in index:
+                coefs[index[key]] += float(weight) * float(theta)
+            else:
+                index[key] = len(exprs)
+                exprs.append(expr)
+                means.append(float(mean_j))
+                stds.append(float(std_j))
+                coefs.append(float(weight) * float(theta))
+    spec = CandidateSpec(candidate_id=candidate_id, basis_exprs=exprs, sigma_mode="constant", ridge=1e-8)
+    combined = LinearBasisModel(spec=spec, feature_cols=feature_cols, ridge=1e-8, device=device)
+    combined.phi_mean = np.asarray(means, dtype=float).reshape(1, -1)
+    combined.phi_std = np.asarray(stds, dtype=float).reshape(1, -1)
+    combined.w = np.asarray(coefs, dtype=float)
+    mu = combined._normalize_phi_pred(combined._basis_matrix(x_fit)) @ combined.w
+    sigma0 = float(np.std(np.asarray(y_fit, dtype=float) - mu) + 1e-3)
+    combined.sigma_params = np.array([np.log(np.expm1(sigma0))], dtype=float)
+    return combined
+
+
+def _compact_refit(
+    model: LinearBasisModel,
+    df_fit: pd.DataFrame,
+    feature_cols: list[str],
+    target_col: str,
+    env_col: str,
+    device: str,
+    tolerance: float,
+    seed: int,
+    k: int = 3,
+    n_alphas: int = 40,
+    ridge: float | None = None,
+    rule: str = "tolerance",
+) -> tuple[LinearBasisModel, dict[str, Any]]:
+    """Sparse relaxed refit of a selected record on its construction rows.
+
+    The lasso path over the standardised basis proposes nested supports; each support is
+    refitted with the record's ridge penalty and scored by environment-stratified
+    cross-fitting; the smallest support whose cross-fit RMSE is within ``tolerance`` of
+    the best support is refitted on all construction rows.  Every step reads only the
+    rows passed in, so the compact record inherits evidence isolation.
+    """
+    from sklearn.linear_model import lasso_path
+
+    from src.eidos.invariance.crossfit import _stratified_folds
+
+    x = df_fit[feature_cols].to_numpy(float)
+    y = df_fit[target_col].to_numpy(float)
+    phi = model._normalize_phi_pred(model._basis_matrix(x))
+    exprs = list(model.spec.basis_exprs)
+    const_idx = [j for j, e in enumerate(exprs) if e.op == "const"]
+    var_idx = [j for j in range(len(exprs)) if j not in const_idx]
+    if len(var_idx) <= 1:
+        return model, {"compact_terms": len(exprs), "dense_terms": len(exprs)}
+    xs = phi[:, var_idx]
+    xs = (xs - xs.mean(axis=0)) / (xs.std(axis=0) + 1e-12)
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        _, coef_path, _ = lasso_path(xs, y - y.mean(), n_alphas=n_alphas, eps=1e-3, max_iter=5000)
+    supports: list[tuple[int, ...]] = []
+    for col in range(coef_path.shape[1]):
+        support = tuple(int(var_idx[j]) for j in np.flatnonzero(np.abs(coef_path[:, col]) > 1e-12))
+        if support and support not in supports:
+            supports.append(support)
+    supports.append(tuple(var_idx))
+    folds = _stratified_folds(env=df_fit[env_col].to_numpy(int), k=k, seed=seed)
+    ridge = float(max(1e-8, model.ridge if ridge is None else ridge))
+
+    def make_spec(support: tuple[int, ...]) -> CandidateSpec:
+        basis = [Const(1.0)] + [exprs[j] for j in support]
+        return CandidateSpec(candidate_id=f"{model.spec.candidate_id}|compact", basis_exprs=basis, ridge=ridge)
+
+    scores = []
+    sq_errors = []
+    for support in supports:
+        spec = make_spec(support)
+        mu = np.zeros_like(y)
+        for fold in range(k):
+            train = folds != fold
+            fitted = LinearBasisModel(spec, feature_cols, ridge=ridge, device=device).fit(x[train], y[train])
+            mu[~train], _ = fitted.predict_mu_sigma(x[~train])
+        scores.append(_rmse(y, mu))
+        sq_errors.append((y - mu) ** 2)
+    best_index = int(np.argmin(scores))
+    if rule == "one_se":
+        # One-standard-error rule on per-observation cross-fit losses: keep the sparsest
+        # support whose mean squared error is within one standard error of the minimum.
+        mse = np.asarray([float(np.mean(e)) for e in sq_errors])
+        se_best = float(np.std(sq_errors[best_index], ddof=1) / np.sqrt(len(y)))
+        eligible = [i for i in range(len(supports)) if mse[i] <= mse[best_index] + se_best]
+    else:
+        best = float(scores[best_index])
+        eligible = [i for i, score in enumerate(scores) if score <= best * (1.0 + float(tolerance))]
+    chosen = min(eligible, key=lambda i: (len(supports[i]), scores[i]))
+    compact = LinearBasisModel(make_spec(supports[chosen]), feature_cols, ridge=ridge, device=device).fit(x, y)
+    return compact, {
+        "compact_terms": len(supports[chosen]) + 1,
+        "dense_terms": len(exprs),
+        "compact_cv_rmse": float(scores[chosen]),
+        "dense_cv_rmse": float(scores[-1]),
+    }
+
+
 def _fit_score_single(
     spec: CandidateSpec,
     df_fit: pd.DataFrame,
@@ -774,6 +992,8 @@ def _fit_score_single(
     new_concepts: int = 0,
     strict_param_code: bool = False,
     fixed_param_step: float = 1e-3,
+    precision_kappa: float | None = None,
+    precision_max_exponent: int = 9,
 ) -> dict[str, Any]:
     x_fit = df_fit[feature_cols].to_numpy(float)
     y_fit = df_fit[target_col].to_numpy(float)
@@ -783,13 +1003,19 @@ def _fit_score_single(
     model = LinearBasisModel(spec=spec, feature_cols=feature_cols, ridge=spec.ridge, device=device)
     model.fit(x_fit, y_fit)
     quantized_param_bits = float("nan")
+    param_step = float(fixed_param_step)
     if strict_param_code:
+        exponent_bits = 0.0
+        if precision_kappa is not None:
+            param_step, _, exponent_bits = _matched_precision_step(
+                model, x_fit, y_fit, float(fixed_param_step), float(precision_kappa), int(precision_max_exponent)
+            )
         quantized = quantize_parameters(
             model.param_vector(),
-            steps=float(fixed_param_step),
+            steps=param_step,
         )
         model.set_param_vector(quantized.values)
-        quantized_param_bits = quantized.code_bits
+        quantized_param_bits = quantized.code_bits + exponent_bits
     mu_eval, sigma_eval = model.predict_mu_sigma(x_eval)
     if use_bin_likelihood:
         dres = dl_data_bin_likelihood(
@@ -880,6 +1106,7 @@ def _fit_score_single(
         "fisher_probe_count": int(probe_count),
         "fisher_stress_bits": float(fisher_stress_bits) if np.isfinite(fisher_stress_bits) else np.nan,
         "param_code_mode": "fixed_grid_elias_delta" if strict_param_code else "legacy_fisher_approximation",
+        "param_step": param_step,
         "rmse_eval": _rmse(y_eval, mu_eval),
         "nll_eval": _nll_student(y_eval, mu_eval, sigma_eval),
     }
@@ -920,14 +1147,74 @@ def run_eidos_dataset(
             device = "cpu"
 
     observed_roles = set(df[split_col].astype(str).unique())
-    strict_protocol = {"disc", "diag", "audit", "cal", "test"}.issubset(observed_roles)
+    # The verification statistic may share the calibration role (compact allocation):
+    # both are downstream certificates of the fixed entry and never reach the payload.
+    verification_role = str(inv_cfg.get("verification_role", "audit"))
+    if verification_role not in {"audit", "cal"}:
+        raise ValueError("invariance.verification_role must be 'audit' or 'cal'")
+    required_roles = {"disc", "diag", "cal", "test"} | ({"audit"} if verification_role == "audit" else set())
+    strict_protocol = required_roles.issubset(observed_roles)
     discovery_role = "disc" if strict_protocol else "work"
-    audit_role = "audit" if strict_protocol else "lock"
+    audit_role = (verification_role if strict_protocol else "lock")
     df_work = df[df[split_col] == discovery_role].copy()
     df_diag = df[df[split_col] == "diag"].copy() if strict_protocol else df_work
     df_lock = df[df[split_col] == audit_role].copy()
     df_cal = df[df[split_col] == "cal"].copy()
     df_test = df[df[split_col] == "test"].copy()
+    # v6 options; every default reproduces the strict_v34 behaviour exactly.
+    crossfit_scope = str(search_cfg.get("crossfit_scope", "disc"))
+    if crossfit_scope not in {"disc", "construction"}:
+        raise ValueError("search.crossfit_scope must be 'disc' or 'construction'")
+    df_crossfit = (
+        pd.concat([df_work, df_diag], ignore_index=True)
+        if strict_protocol and crossfit_scope == "construction"
+        else df_work
+    )
+    fold_quantize = bool(search_cfg.get("fold_quantize", False))
+    raw_kappa = search_cfg.get("precision_kappa")
+    precision_kappa = None if raw_kappa is None else float(raw_kappa)
+    precision_max_exponent = int(search_cfg.get("precision_max_exponent", 9))
+    invariance_gate = str(search_cfg.get("invariance_gate", "hard"))
+    if invariance_gate not in {"hard", "off"}:
+        raise ValueError("search.invariance_gate must be 'hard' or 'off'")
+    base_param_step = float(search_cfg.get("fixed_param_step", 1e-3))
+
+    def _crossfit_factory(spec_for_fold: CandidateSpec):
+        if strict_protocol and fold_quantize:
+            return lambda s=spec_for_fold: _GridFoldModel(
+                s,
+                feature_cols,
+                ridge=s.ridge,
+                device=device,
+                base_step=base_param_step,
+                kappa=precision_kappa,
+                max_exponent=precision_max_exponent,
+            )
+        return lambda s=spec_for_fold: LinearBasisModel(s, feature_cols, ridge=s.ridge, device=device)
+
+    crossfit_repeats = max(1, int(search_cfg.get("crossfit_repeats", 1)))
+
+    def _crossfit_scores(spec_for_fold: CandidateSpec) -> tuple[float, np.ndarray]:
+        """Mean cross-fit RMSE over ``crossfit_repeats`` fold maps and the averaged OOF predictions.
+
+        Repeat 0 uses the archived fold seed, so one repeat reproduces the single cross-fit.
+        """
+        y_cf = df_crossfit[target_col].to_numpy(float)
+        rmses: list[float] = []
+        mus: list[np.ndarray] = []
+        for repeat in range(crossfit_repeats):
+            cf_r = crossfit_residuals(
+                df=df_crossfit,
+                feature_cols=feature_cols,
+                target_col=target_col,
+                env_col=env_col,
+                model_factory=_crossfit_factory(spec_for_fold),
+                k=int(search_cfg.get("crossfit_k", 2)),
+                seed=seed if repeat == 0 else seed + 7919 * repeat,
+            )
+            rmses.append(_rmse(y_cf, cf_r.mu))
+            mus.append(cf_r.mu)
+        return float(np.mean(rmses)), np.mean(np.vstack(mus), axis=0)
     unit_map = {c: dict(UNIT_DIMENSIONLESS) for c in feature_cols}
     if isinstance(var_units, dict):
         for c in feature_cols:
@@ -1124,6 +1411,35 @@ def run_eidos_dataset(
                 enable_competitive_union=bool(search_cfg.get("enable_structural_competitive_union", False)),
                 competitive_union_max_terms=int(search_cfg.get("structural_competitive_union_max_terms", 360)),
                 competitive_union_ridge=float(search_cfg.get("structural_competitive_union_ridge", 0.08)),
+            )
+        )
+    if bool(search_cfg.get("enable_powerlaw", False)) and search_cfg.get("feature_affine") and search_cfg.get(
+        "target_affine"
+    ):
+        candidates.extend(
+            powerlaw_candidate_library(
+                feature_cols=feature_cols,
+                x_disc=df_work[feature_cols].to_numpy(float),
+                y_disc=df_work[target_col].to_numpy(float),
+                feature_affine=search_cfg["feature_affine"],
+                target_affine=search_cfg["target_affine"],
+            )
+        )
+    if bool(search_cfg.get("enable_trig_pair", False)):
+        pair_top = int(search_cfg.get("trig_pair_top_features", 5))
+        pair_priority = _priority_features_by_correlation(
+            df_work=df_work,
+            feature_cols=feature_cols,
+            target_col=target_col,
+            top_n=pair_top,
+        )
+        candidates.extend(
+            trig_pair_candidate_library(
+                feature_cols=feature_cols,
+                priority_features=pair_priority,
+                top_features=pair_top,
+                scales=[float(v) for v in search_cfg.get("trig_pair_scales", [0.6, 1.2])],
+                ridge=float(search_cfg.get("trig_pair_ridge", 0.3)),
             )
         )
     if bool(search_cfg.get("enable_partition_candidates", False)):
@@ -1324,7 +1640,11 @@ def run_eidos_dataset(
     conf_cert_cache: dict[str, tuple[float, float]] = {}
     layer2_start = time.time()
     selection_policy = str(search_cfg.get("selection_policy", "dl_only"))
+    graded_leakage_lambda = float(search_cfg.get("graded_leakage_lambda", 0.0))
+    if not 0.0 <= graded_leakage_lambda <= 1.0:
+        raise ValueError("search.graded_leakage_lambda must lie in [0, 1]")
     for spec in layer2_specs:
+        rmse_cal = float("nan")
         out = _fit_score_single(
             spec=spec,
             df_fit=df_work,
@@ -1342,22 +1662,21 @@ def run_eidos_dataset(
             fisher_seed=_stable_seed(seed, spec.candidate_id, salt=23),
             strict_param_code=strict_protocol,
             fixed_param_step=float(search_cfg.get("fixed_param_step", 1e-3)),
+            precision_kappa=precision_kappa if strict_protocol else None,
+            precision_max_exponent=precision_max_exponent,
         )
 
         if strict_protocol:
             rmse_crossfit_work = float("nan")
+            oof_mu = None
             if ablation.use_crossfit and selection_policy.startswith("cv_"):
-                cf = crossfit_residuals(
-                    df=df_work,
-                    feature_cols=feature_cols,
-                    target_col=target_col,
-                    env_col=env_col,
-                    model_factory=lambda s=spec: LinearBasisModel(s, feature_cols, ridge=s.ridge, device=device),
-                    k=int(search_cfg.get("crossfit_k", 2)),
-                    seed=seed,
-                )
-                rmse_crossfit_work = _rmse(df_work[target_col].to_numpy(float), cf.mu)
+                rmse_crossfit_work, oof_mu = _crossfit_scores(spec)
             model = out["model"]
+            if df_cal.empty:
+                rmse_cal = float("nan")
+            else:
+                mu_cal, _ = model.predict_mu_sigma(df_cal[feature_cols].to_numpy(float))
+                rmse_cal = _rmse(df_cal[target_col].to_numpy(float), mu_cal)
             mu_diag, sigma_diag = model.predict_mu_sigma(df_diag[feature_cols].to_numpy(float))
             z = (df_diag[target_col].to_numpy(float) - mu_diag) / np.maximum(sigma_diag, 1e-8)
             z = normalize_residuals_by_env(
@@ -1405,6 +1724,7 @@ def run_eidos_dataset(
             p_inv_work = float(inv.p_value)
         else:
             rmse_crossfit_work = float("nan")
+            rmse_cal = float("nan")
             model = out["model"]
             mu_w, sigma_w = model.predict_mu_sigma(df_work[feature_cols].to_numpy(float))
             z = (df_work[target_col].to_numpy(float) - mu_w) / np.maximum(sigma_w, 1e-8)
@@ -1447,6 +1767,9 @@ def run_eidos_dataset(
             "fisher_probe_count": out["fisher_probe_count"],
             "rmse_work": out["rmse_eval"],
             "rmse_crossfit_work": rmse_crossfit_work,
+            "rmse_cal": rmse_cal,
+            "oof_mu": oof_mu if strict_protocol else None,
+            "diag_mu": mu_diag if strict_protocol else None,
             "nll_work": out["nll_eval"],
         }
         layer2_rows.append(row)
@@ -1885,12 +2208,20 @@ def run_eidos_dataset(
     layer2_time = time.time() - layer2_start
     l2 = pd.DataFrame(layer2_rows).sort_values("dl_total")
     alpha_inv = float(inv_cfg.get("alpha_inv", 0.05))
-    valid = l2[l2["p_inv_work"] >= alpha_inv]
+    n_gate_survivors = int((l2["p_inv_work"] >= alpha_inv).sum())
+    gate_fallback = False
+    if invariance_gate == "off":
+        valid = l2
+    else:
+        valid = l2[l2["p_inv_work"] >= alpha_inv]
     if valid.empty:
         # If all fail invariance screen, keep top by p-value to avoid degenerate fallback.
+        gate_fallback = True
         valid = l2.sort_values(["p_inv_work", "rmse_work"], ascending=[False, True]).head(
             max(3, int(search_cfg.get("top_k", 12) // 3))
         )
+    selection_ranked: pd.DataFrame | None = None
+    ridge_ranked: pd.DataFrame | None = None
 
     if forced_candidate_id is not None and str(forced_candidate_id).startswith("meta_"):
         raise RuntimeError("forced_candidate_id with meta_* is forbidden for EIDOS strict mode.")
@@ -1927,7 +2258,33 @@ def run_eidos_dataset(
             tmp["rmse_select"] = tmp["rmse_crossfit_work"].where(
                 np.isfinite(tmp["rmse_crossfit_work"]), tmp["rmse_work"]
             )
-            best_row = tmp.sort_values(["rmse_select", "rmse_work", "dl_total", "p_inv_work"], ascending=[True, True, True, False]).iloc[0]
+            selection_ranked = tmp.sort_values(
+                ["rmse_select", "rmse_work", "dl_total", "p_inv_work"], ascending=[True, True, True, False]
+            )
+            best_row = selection_ranked.iloc[0]
+        elif selection_policy == "cv_graded_calibration_rmse_then_dl":
+            if df_cal.empty:
+                raise ValueError("graded calibration selection requires a non-empty calibration role")
+            tmp = valid.copy()
+            tmp["rmse_crossfit_finite"] = tmp["rmse_crossfit_work"].where(
+                np.isfinite(tmp["rmse_crossfit_work"]), tmp["rmse_work"]
+            )
+            tmp["rmse_select"] = (
+                (1.0 - graded_leakage_lambda) * tmp["rmse_crossfit_finite"]
+                + graded_leakage_lambda * tmp["rmse_cal"]
+            )
+            selection_ranked = tmp.sort_values(
+                [
+                    "rmse_select",
+                    "rmse_crossfit_finite",
+                    "rmse_cal",
+                    "rmse_work",
+                    "dl_total",
+                    "p_inv_work",
+                ],
+                ascending=[True, True, True, True, True, False],
+            )
+            best_row = selection_ranked.iloc[0]
         elif selection_policy == "cv_pooled_rmse_then_dl":
             tmp = valid.copy()
             tmp["rmse_crossfit_finite"] = tmp["rmse_crossfit_work"].where(
@@ -2030,28 +2387,33 @@ def run_eidos_dataset(
                 fisher_seed=_stable_seed(seed, variant.candidate_id, salt=10_003 + int(round(multiplier * 1000))),
                 strict_param_code=True,
                 fixed_param_step=float(search_cfg.get("fixed_param_step", 1e-3)),
+                precision_kappa=precision_kappa,
+                precision_max_exponent=precision_max_exponent,
             )
-            cf = crossfit_residuals(
-                df=df_work,
-                feature_cols=feature_cols,
-                target_col=target_col,
-                env_col=env_col,
-                model_factory=lambda spec=variant: LinearBasisModel(
-                    spec, feature_cols, ridge=spec.ridge, device=device
-                ),
-                k=int(search_cfg.get("crossfit_k", 2)),
-                seed=seed,
-            )
-            cv_rmse = _rmse(df_work[target_col].to_numpy(float), cf.mu)
-            pooled_rmse = float(
-                _pooled_out_of_sample_rmse(
-                    np.asarray([cv_rmse]),
-                    np.asarray([float(out["rmse_eval"])]),
-                    n_crossfit=int(df_work.shape[0]),
-                    n_diagnosis=int(df_diag.shape[0]),
-                )[0]
-            )
+            cv_rmse, _ = _crossfit_scores(variant)
+            if crossfit_scope == "construction":
+                # Diagnosis rows are already inside the cross-fit, so the pooled
+                # out-of-sample error is the construction-set cross-fit error itself.
+                pooled_rmse = float(cv_rmse)
+            else:
+                pooled_rmse = float(
+                    _pooled_out_of_sample_rmse(
+                        np.asarray([cv_rmse]),
+                        np.asarray([float(out["rmse_eval"])]),
+                        n_crossfit=int(df_work.shape[0]),
+                        n_diagnosis=int(df_diag.shape[0]),
+                    )[0]
+                )
             mu_diag, sigma_diag = out["model"].predict_mu_sigma(df_diag[feature_cols].to_numpy(float))
+            if df_cal.empty:
+                ridge_rmse_cal = float("nan")
+            else:
+                mu_cal, _ = out["model"].predict_mu_sigma(df_cal[feature_cols].to_numpy(float))
+                ridge_rmse_cal = _rmse(df_cal[target_col].to_numpy(float), mu_cal)
+            graded_rmse = (
+                (1.0 - graded_leakage_lambda) * cv_rmse
+                + graded_leakage_lambda * ridge_rmse_cal
+            )
             z_diag = (df_diag[target_col].to_numpy(float) - mu_diag) / np.maximum(sigma_diag, 1e-8)
             z_diag = normalize_residuals_by_env(
                 z_diag,
@@ -2075,20 +2437,31 @@ def run_eidos_dataset(
                     "rmse_work": float(out["rmse_eval"]),
                     "rmse_crossfit_work": cv_rmse,
                     "pooled_oos_rmse": pooled_rmse,
+                    "rmse_cal": ridge_rmse_cal,
+                    "graded_rmse": graded_rmse,
                     "nll_work": float(out["nll_eval"]),
                     "p_inv_work": float(ridge_inv.p_value),
                     "inv_stat_work": float(ridge_inv.stat),
                 }
             )
         ridge_table = pd.DataFrame(ridge_rows)
-        ridge_valid = ridge_table[ridge_table["p_inv_work"] >= alpha_inv]
+        if invariance_gate == "off":
+            ridge_valid = ridge_table
+        else:
+            ridge_valid = ridge_table[ridge_table["p_inv_work"] >= alpha_inv]
         if ridge_valid.empty:
             ridge_valid = ridge_table.sort_values(
                 ["p_inv_work", "pooled_oos_rmse"], ascending=[False, True]
             ).head(1)
-        tuned = ridge_valid.sort_values(
-            ["pooled_oos_rmse", "rmse_crossfit_work", "rmse_work", "dl_total"]
-        ).iloc[0]
+        if selection_policy == "cv_graded_calibration_rmse_then_dl":
+            ridge_ranked = ridge_valid.sort_values(
+                ["graded_rmse", "rmse_crossfit_work", "rmse_cal", "rmse_work", "dl_total"]
+            )
+        else:
+            ridge_ranked = ridge_valid.sort_values(
+                ["pooled_oos_rmse", "rmse_crossfit_work", "rmse_work", "dl_total"]
+            )
+        tuned = ridge_ranked.iloc[0]
         if ablation.use_fisher:
             verified = _fit_score_single(
                 spec=tuned["model"].spec,
@@ -2107,6 +2480,8 @@ def run_eidos_dataset(
                 fisher_seed=int(tuned["fisher_probe_seed"]),
                 strict_param_code=True,
                 fixed_param_step=float(search_cfg.get("fixed_param_step", 1e-3)),
+                precision_kappa=precision_kappa,
+                precision_max_exponent=precision_max_exponent,
             )
             tuned = tuned.copy()
             for key, value in verified.items():
@@ -2140,6 +2515,8 @@ def run_eidos_dataset(
         best_row["postselect_ridge"] = float(tuned["ridge"])
         best_row["postselect_ridge_multiplier"] = float(tuned["ridge_multiplier"])
         best_row["postselect_pooled_oos_rmse"] = float(tuned["pooled_oos_rmse"])
+        best_row["postselect_graded_rmse"] = float(tuned["graded_rmse"])
+        best_row["rmse_cal"] = float(tuned["rmse_cal"])
         ledger.log(
             {
                 "run_id": run_id,
@@ -2168,6 +2545,11 @@ def run_eidos_dataset(
     best_candidate_id = str(best_row["candidate_id"])
     final_refit_roles = discovery_role
     final_refit_n = int(df_work.shape[0])
+    full_precision_mu_test: np.ndarray | None = None
+    final_param_step = base_param_step
+    stack_info: dict[str, Any] | None = None
+    compact_info: dict[str, Any] | None = None
+    arbitration_info: dict[str, Any] | None = None
     if strict_protocol:
         df_refit = pd.concat([df_work, df_diag], ignore_index=True)
         best_model = LinearBasisModel(
@@ -2176,13 +2558,125 @@ def run_eidos_dataset(
             ridge=selection_model.ridge,
             device=device,
         )
-        best_model.fit(
-            df_refit[feature_cols].to_numpy(float),
-            df_refit[target_col].to_numpy(float),
+        x_refit = df_refit[feature_cols].to_numpy(float)
+        y_refit = df_refit[target_col].to_numpy(float)
+        best_model.fit(x_refit, y_refit)
+        stack_top_m = int(search_cfg.get("stack_top_m", 1))
+        if stack_top_m > 1 and selection_ranked is not None and "oof_mu" in selection_ranked.columns:
+            top = selection_ranked.head(stack_top_m)
+            use_stack_pipeline = top.shape[0] > 1 and all(isinstance(v, np.ndarray) for v in top["oof_mu"])
+            if use_stack_pipeline and bool(search_cfg.get("stack_arbitrate", False)) and crossfit_scope == "disc":
+                # Held-out arbitration: build the aggregated (and compacted) record from discovery
+                # rows only and keep it only if it beats the single record on the diagnosis role.
+                x_disc = df_work[feature_cols].to_numpy(float)
+                y_disc = df_work[target_col].to_numpy(float)
+                w_disc = _stack_weights(
+                    np.column_stack([np.asarray(v) for v in top["oof_mu"]]),
+                    y_disc,
+                    convex=bool(search_cfg.get("stack_convex", False)),
+                )
+                disc_components = [selection_model] + [r["model"] for _, r in top.iloc[1:].iterrows()]
+                trial = _combine_linear_records(
+                    disc_components, w_disc, feature_cols, device, "stack_trial", x_disc, y_disc
+                )
+                if search_cfg.get("compact_tol") is not None:
+                    trial, _ = _compact_refit(
+                        trial,
+                        df_work,
+                        feature_cols,
+                        target_col,
+                        env_col,
+                        device,
+                        tolerance=float(search_cfg.get("compact_tol")),
+                        seed=seed,
+                        ridge=float(selection_model.ridge),
+                        rule=str(search_cfg.get("compact_rule", "tolerance")),
+                    )
+                x_diag = df_diag[feature_cols].to_numpy(float)
+                y_diag = df_diag[target_col].to_numpy(float)
+                trial_rmse = _rmse(y_diag, trial.predict_mu_sigma(x_diag)[0])
+                single_rmse = _rmse(y_diag, selection_model.predict_mu_sigma(x_diag)[0])
+                use_stack_pipeline = bool(trial_rmse < single_rmse)
+                arbitration_info = {
+                    "arbiter_stack_diag_rmse": float(trial_rmse).hex(),
+                    "arbiter_single_diag_rmse": float(single_rmse).hex(),
+                    "arbiter_choice": "stack" if use_stack_pipeline else "single",
+                }
+            if use_stack_pipeline:
+                use_diag = crossfit_scope != "construction"
+                columns = [
+                    np.concatenate([np.asarray(r["oof_mu"])] + ([np.asarray(r["diag_mu"])] if use_diag else []))
+                    for _, r in top.iterrows()
+                ]
+                y_stack = np.concatenate(
+                    [df_crossfit[target_col].to_numpy(float)]
+                    + ([df_diag[target_col].to_numpy(float)] if use_diag else [])
+                )
+                weights = _stack_weights(
+                    np.column_stack(columns), y_stack, convex=bool(search_cfg.get("stack_convex", False))
+                )
+                components: list[LinearBasisModel] = []
+                ids: list[str] = []
+                for position, (_, r) in enumerate(top.iterrows()):
+                    if position == 0:
+                        components.append(best_model)
+                    else:
+                        component_spec = r["model"].spec
+                        components.append(
+                            LinearBasisModel(
+                                component_spec, feature_cols, ridge=component_spec.ridge, device=device
+                            ).fit(x_refit, y_refit)
+                        )
+                    ids.append(str(r["candidate_id"]))
+                kept_ids = [cid for cid, w in zip(ids, weights) if w > 0.0]
+                best_model = _combine_linear_records(
+                    components,
+                    weights,
+                    feature_cols,
+                    device,
+                    "stack:" + "+".join(kept_ids),
+                    x_refit,
+                    y_refit,
+                )
+                best_candidate_id = best_model.spec.candidate_id
+                stack_info = {
+                    "stack_components": ids,
+                    "stack_weights": [float(w).hex() for w in weights],
+                    "stack_n_components": int(np.count_nonzero(weights)),
+                }
+        raw_compact_tol = search_cfg.get("compact_tol")
+        if arbitration_info is not None and arbitration_info["arbiter_choice"] == "single":
+            raw_compact_tol = None
+        if raw_compact_tol is not None:
+            best_model, compact_info = _compact_refit(
+                best_model,
+                df_refit,
+                feature_cols,
+                target_col,
+                env_col,
+                device,
+                tolerance=float(raw_compact_tol),
+                seed=seed,
+                ridge=float(selection_model.ridge),
+                rule=str(search_cfg.get("compact_rule", "tolerance")),
+            )
+            best_candidate_id = best_model.spec.candidate_id
+        full_precision_mu_test, _ = best_model.predict_mu_sigma(
+            df_test[feature_cols].to_numpy(float)
         )
+        final_param_step = base_param_step
+        if precision_kappa is not None:
+            final_param_step, _, _ = _matched_precision_step(
+                best_model,
+                df_refit[feature_cols].to_numpy(float),
+                df_refit[target_col].to_numpy(float),
+                base_param_step,
+                precision_kappa,
+                precision_max_exponent,
+            )
         quantized = quantize_parameters(
             best_model.param_vector(),
-            steps=float(search_cfg.get("fixed_param_step", 1e-3)),
+            steps=final_param_step,
         )
         best_model.set_param_vector(quantized.values)
         final_refit_roles = "disc+diag"
@@ -2235,6 +2729,11 @@ def run_eidos_dataset(
 
     rmse_test = _rmse(df_test[target_col].to_numpy(float), mu_test)
     nll_test = _nll_student(df_test[target_col].to_numpy(float), mu_test, sigma_test)
+    rmse_test_full_precision = (
+        _rmse(df_test[target_col].to_numpy(float), full_precision_mu_test)
+        if full_precision_mu_test is not None
+        else rmse_test
+    )
 
     # ledger for final event
     ledger.log(
@@ -2335,7 +2834,47 @@ def run_eidos_dataset(
         "runtime_sec": total_runtime,
         "final_refit_roles": final_refit_roles,
         "final_refit_n": final_refit_n,
+        "rmse_test_quantized": float(rmse_test),
+        "rmse_test_full_precision": float(rmse_test_full_precision),
+        "quantized_over_full_precision_rmse_ratio": float(
+            rmse_test / max(rmse_test_full_precision, 1e-300)
+        ),
+        "n_gate_evaluated": int(l2.shape[0]),
+        "n_gate_survivors": n_gate_survivors,
+        "gate_fallback": bool(gate_fallback),
+        "final_param_step": float(final_param_step),
+        "final_ridge_multiplier": float(best_row.get("postselect_ridge_multiplier", 1.0)),
+        "inv_stat_lock": float(inv_stat_lock),
+        "final_n_basis": int(len(best_model.spec.basis_exprs)),
+        "stack_n_components": int(stack_info["stack_n_components"]) if stack_info else 1,
+        "compact_terms": int(compact_info["compact_terms"]) if compact_info else None,
+        "dense_terms": int(compact_info["dense_terms"]) if compact_info else None,
+        "arbiter_choice": arbitration_info["arbiter_choice"] if arbitration_info else None,
     }
+    selection_trace: dict[str, Any] | None = None
+    if selection_ranked is not None:
+        selection_trace = {
+            "selection_order": [str(v) for v in selection_ranked["candidate_id"].tolist()],
+            "selection_keys": [float(v).hex() for v in selection_ranked["rmse_select"].astype(float).tolist()],
+            "selection_p_inv": [float(v) for v in selection_ranked["p_inv_work"].astype(float).tolist()],
+            "selection_rmse_work": [float(v) for v in selection_ranked["rmse_work"].astype(float).tolist()],
+            "stack": stack_info,
+            "compact": compact_info,
+            "arbitration": arbitration_info,
+            "ridge_order": []
+            if ridge_ranked is None
+            else [float(v).hex() for v in ridge_ranked["ridge_multiplier"].astype(float).tolist()],
+            "ridge_keys": []
+            if ridge_ranked is None
+            else [
+                float(v).hex()
+                for v in ridge_ranked[
+                    "graded_rmse" if selection_policy == "cv_graded_calibration_rmse_then_dl" else "pooled_oos_rmse"
+                ]
+                .astype(float)
+                .tolist()
+            ],
+        }
     if audit_trace:
         try:
             expr_str = best_model.to_expr().to_string()
@@ -2358,6 +2897,12 @@ def run_eidos_dataset(
                 "final_postselect_ridge_multiplier": float(best_row.get("postselect_ridge_multiplier", 1.0)),
                 "final_postselect_pooled_oos_rmse": float(best_row.get("postselect_pooled_oos_rmse", np.nan))
                 if np.isfinite(best_row.get("postselect_pooled_oos_rmse", np.nan))
+                else None,
+                "final_postselect_graded_rmse": float(best_row.get("postselect_graded_rmse", np.nan))
+                if np.isfinite(best_row.get("postselect_graded_rmse", np.nan))
+                else None,
+                "final_rmse_cal": float(best_row.get("rmse_cal", np.nan))
+                if np.isfinite(best_row.get("rmse_cal", np.nan))
                 else None,
                 "final_nll_work": float(best_row["nll_work"]),
                 "final_inv_stat_work": float(best_row.get("inv_stat_work", np.nan)),
@@ -2391,4 +2936,5 @@ def run_eidos_dataset(
         test_pred=np.asarray(mu_test, dtype=float).copy(),
         test_lower=final_cp.lower,
         test_upper=final_cp.upper,
+        selection_trace=selection_trace,
     )

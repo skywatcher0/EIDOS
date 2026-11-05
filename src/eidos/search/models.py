@@ -464,6 +464,130 @@ def adaptive_trig_candidate_library(
     ]
 
 
+def powerlaw_candidate_library(
+    feature_cols: list[str],
+    x_disc: np.ndarray,
+    y_disc: np.ndarray,
+    feature_affine: dict[str, list[float]],
+    target_affine: list[float],
+    snap_tolerance: float = 0.05,
+    ridge: float = 1e-4,
+) -> list[CandidateSpec]:
+    """Monomial (power-law) structures proposed on the discovery-declared raw scale.
+
+    The frozen preprocessing maps every raw quantity to ``z = (v - m)/s``; the affine maps are
+    part of the task context.  When the raw response and some raw features keep a constant,
+    non-zero sign on the discovery rows, the exponents of ``|y| ~ prod_j |x_j|^a_j`` are fitted by
+    least squares on the log scale using discovery rows only, snapped to the nearest
+    half-integer when within ``snap_tolerance``, and compiled into one basis expression
+    ``exp(sum_j a_j log(c_j z_j + d_j))`` with ``c_j z_j + d_j = |x_j| / g_j`` on the discovery
+    range (``g_j`` the discovery geometric mean, which keeps the exponent well inside the
+    evaluator's clipping range).  The response scale and sign enter through the linear
+    coefficient of the record, so an exact power law is represented exactly.
+    """
+
+    y_center, y_scale = float(target_affine[0]), float(target_affine[1])
+    y_raw = np.asarray(y_disc, dtype=float) * y_scale + y_center
+    if y_raw.size < 8 or np.any(y_raw == 0.0) or abs(np.sign(y_raw).sum()) != y_raw.size:
+        return []
+    logs: list[np.ndarray] = []
+    maps: list[tuple[str, float, float]] = []
+    for j, col in enumerate(feature_cols):
+        if col not in feature_affine:
+            continue
+        mean_j, scale_j = (float(v) for v in feature_affine[col])
+        raw = np.asarray(x_disc[:, j], dtype=float) * scale_j + mean_j
+        if np.any(raw == 0.0) or abs(np.sign(raw).sum()) != raw.size:
+            continue
+        sign = float(np.sign(raw[0]))
+        geo = float(np.exp(np.mean(np.log(np.abs(raw)))))
+        logs.append(np.log(np.abs(raw) / geo))
+        maps.append((col, sign * scale_j / geo, sign * mean_j / geo))
+    if not maps:
+        return []
+    design = np.column_stack([np.ones(y_raw.size)] + logs)
+    coef = np.linalg.lstsq(design, np.log(np.abs(y_raw)), rcond=None)[0][1:]
+    free = np.round(coef, 3)
+    halves = np.round(2.0 * coef) / 2.0
+    snapped = np.where(np.abs(coef - halves) < snap_tolerance, halves, free)
+    sparse = np.where(np.abs(snapped) < snap_tolerance, 0.0, snapped)
+
+    def monomial(exponents: np.ndarray) -> Expr | None:
+        total: Expr | None = None
+        for a, (col, c, d) in zip(exponents, maps, strict=True):
+            if a == 0.0:
+                continue
+            inner = op2("add", op2("mul", Const(c), Var(col)), Const(d))
+            term = op2("mul", Const(float(a)), op1("log", inner))
+            total = term if total is None else op2("add", total, term)
+        return None if total is None else op1("exp", total)
+
+    specs: list[CandidateSpec] = []
+    seen: set[tuple[float, ...]] = set()
+    for name, exps in (("powerlaw_free", free), ("powerlaw_snap", snapped), ("powerlaw_sparse", sparse)):
+        key = tuple(float(v) for v in exps)
+        expr = monomial(exps)
+        if expr is None or key in seen:
+            continue
+        seen.add(key)
+        specs.append(CandidateSpec(candidate_id=name, basis_exprs=[Const(1.0), expr], ridge=float(ridge)))
+    snap_expr = monomial(snapped)
+    if snap_expr is not None:
+        specs.append(
+            CandidateSpec(
+                candidate_id="powerlaw_snap_linear",
+                basis_exprs=[Const(1.0), snap_expr] + [Var(c) for c in feature_cols],
+                ridge=float(ridge),
+            )
+        )
+    return specs
+
+
+def trig_pair_candidate_library(
+    feature_cols: list[str],
+    priority_features: list[str],
+    top_features: int = 5,
+    scales: list[float] | None = None,
+    ridge: float = 0.3,
+) -> list[CandidateSpec]:
+    """Additive pairwise trigonometric interactions over the top discovery features.
+
+    Each term is a closed form in at most two variables: ``sin``/``cos`` of a scaled
+    product ``k*xi*xj`` or of a scaled sum/difference ``k*(xi +/- xj)``.  Together with the
+    linear and quadratic terms this spans phase-shifted oscillations of a bilinear
+    argument (``sin(a + b*xi + c*xj + d*xi*xj)`` to first order in the pair terms), which
+    the univariate trigonometric dictionaries cannot express.
+    """
+
+    feature_set = set(feature_cols)
+    use_feats = [f for f in priority_features if f in feature_set][: max(2, int(top_features))]
+    if len(use_feats) < 2:
+        return []
+    ks = scales or [0.6, 1.2]
+    pair_terms: list[Expr] = []
+    for i in range(len(use_feats)):
+        for j in range(i + 1, len(use_feats)):
+            xi, xj = Var(use_feats[i]), Var(use_feats[j])
+            prod = op2("mul", xi, xj)
+            plus = op2("add", xi, xj)
+            minus = op2("sub", xi, xj)
+            pair_terms.append(prod)
+            for k in ks:
+                kk = Const(float(k))
+                for arg in (prod, plus, minus):
+                    pair_terms.append(op1("sin", op2("mul", kk, arg)))
+                    pair_terms.append(op1("cos", op2("mul", kk, arg)))
+    basis = [Const(1.0)] + [Var(c) for c in use_feats] + [op2("mul", Var(c), Var(c)) for c in use_feats] + pair_terms
+    return [
+        CandidateSpec(
+            candidate_id="struct_trig_pair_additive",
+            basis_exprs=basis,
+            sigma_mode="constant",
+            ridge=float(ridge),
+        )
+    ]
+
+
 def structural_boost_candidate_library(
     feature_cols: list[str],
     priority_features: list[str],

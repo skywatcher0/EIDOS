@@ -1,0 +1,4 @@
+generator,noise_sigma,runs,recovery_rate,semantic_nrmse,operator_precision,operator_recall
+blackbody,0.8,1,1.0,0.0053978462279917,1.0,1.0
+lorentz,0.8,1,1.0,0.0384766160146721,1.0,1.0
+oscillator,0.8,1,1.0,0.0832207256785377,1.0,1.0
