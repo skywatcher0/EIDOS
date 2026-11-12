@@ -1,3 +1,0 @@
-benchmark_role,tasks,median_rmse,median_runtime_sec,median_basis_terms,replacement_passes
-auxiliary_tabular,1,0.7501444450743289,0.8937129001133144,3.0,1
-mechanism_or_synthetic,1,0.0002773812825698,0.6063990998081863,39.0,1

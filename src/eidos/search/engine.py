@@ -9,25 +9,25 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from src.eidos.canon.semhash import semantic_hash
-from src.eidos.canon.syn import canonicalize_syn
-from src.eidos.conformal.split_cp import ConformalResult, conformal_quantile, split_conformal_regression
-from src.eidos.dsl.grammar import Const, Expr, Var, op1, op2, op3
-from src.eidos.dsl.domain_safety import interval_analysis
-from src.eidos.dsl.types_units import UNIT_DIMENSIONLESS, infer_type_unit
-from src.eidos.invariance.crossfit import crossfit_residuals
-from src.eidos.invariance.mmd_rff import mmd_rff_permutation_test
-from src.eidos.invariance.residual_normalization import normalize_residuals_by_env
-from src.eidos.mdl.data_code import dl_data_bin_likelihood, dl_data_naive_pdf
-from src.eidos.mdl.fisher_code import (
+from eidos.canon.semhash import semantic_hash
+from eidos.canon.syn import canonicalize_syn
+from eidos.conformal.split_cp import ConformalResult, conformal_quantile, split_conformal_regression
+from eidos.dsl.grammar import Const, Expr, Var, op1, op2, op3
+from eidos.dsl.domain_safety import interval_analysis
+from eidos.dsl.types_units import UNIT_DIMENSIONLESS, infer_type_unit
+from eidos.invariance.crossfit import crossfit_residuals
+from eidos.invariance.mmd_rff import mmd_rff_permutation_test
+from eidos.invariance.residual_normalization import normalize_residuals_by_env
+from eidos.mdl.data_code import dl_data_bin_likelihood, dl_data_naive_pdf
+from eidos.mdl.fisher_code import (
     estimate_fisher_info_with_diagnostics,
     fisher_param_code_bits,
     uniform_param_code_bits,
 )
-from src.eidos.mdl.param_code import quantize_parameters
-from src.eidos.mdl.struct_code import grammar_code_bits, grammar_extension_code_bits, struct_code_bits
-from src.eidos.mdl.total import build_breakdown
-from src.eidos.search.models import (
+from eidos.mdl.param_code import quantize_parameters
+from eidos.mdl.struct_code import grammar_code_bits, grammar_extension_code_bits, struct_code_bits
+from eidos.mdl.total import build_breakdown
+from eidos.search.models import (
     CandidateSpec,
     LinearBasisModel,
     adaptive_trig_candidate_library,
@@ -37,7 +37,7 @@ from src.eidos.search.models import (
     structural_boost_candidate_library,
     trig_pair_candidate_library,
 )
-from src.utils.ledger import LedgerWriter
+from eidos._utils.ledger import LedgerWriter
 
 
 @dataclass
@@ -913,7 +913,7 @@ def _compact_refit(
     """
     from sklearn.linear_model import lasso_path
 
-    from src.eidos.invariance.crossfit import _stratified_folds
+    from eidos.invariance.crossfit import _stratified_folds
 
     x = df_fit[feature_cols].to_numpy(float)
     y = df_fit[target_col].to_numpy(float)
@@ -1161,7 +1161,7 @@ def run_eidos_dataset(
     df_lock = df[df[split_col] == audit_role].copy()
     df_cal = df[df[split_col] == "cal"].copy()
     df_test = df[df[split_col] == "test"].copy()
-    # v6 options; every default reproduces the strict_v34 behaviour exactly.
+    # Construction controls; downstream roles do not participate in selection.
     crossfit_scope = str(search_cfg.get("crossfit_scope", "disc"))
     if crossfit_scope not in {"disc", "construction"}:
         raise ValueError("search.crossfit_scope must be 'disc' or 'construction'")
@@ -1576,7 +1576,7 @@ def run_eidos_dataset(
                 )
             )
             # stable per-sample recomputation
-            from src.eidos.mdl.data_code import bin_prob_mass
+            from eidos.mdl.data_code import bin_prob_mass
 
             probs = bin_prob_mass(
                 y_tilde=sub[target_col].to_numpy(float),

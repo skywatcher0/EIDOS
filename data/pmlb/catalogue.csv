@@ -1,244 +1,244 @@
-task_index,dataset,n_instances,n_features,n_binary_features,n_categorical_features,n_continuous_features,task_family,benchmark_role,included_in_v33_strict100,deprecated_in_current_catalog,v34_inclusion_reason
-0,706_sleuth_case1202,93,6,1,1,4,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-1,first_principles_planck,100,2,0,0,2,FirstPrinciples,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-2,594_fri_c2_100_5,100,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-3,611_fri_c3_100_5,100,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-4,624_fri_c0_100_5,100,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-5,656_fri_c1_100_5,100,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-6,591_fri_c1_100_10,100,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-7,621_fri_c0_100_10,100,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-8,634_fri_c2_100_10,100,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-9,651_fri_c0_100_25,100,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-10,210_cloud,108,5,1,1,3,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-11,678_visualizing_environmental,111,3,0,0,3,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-12,663_rabe_266,120,2,0,1,1,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-13,665_sleuth_case2002,147,6,4,0,2,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-14,_deprecated_195_auto_price,159,15,0,1,14,other PMLB,auxiliary_tabular,False,True,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-15,_deprecated_207_autoPrice,159,15,0,1,14,other PMLB,auxiliary_tabular,False,True,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-16,auto_insurance_losses,164,24,3,6,15,other PMLB,auxiliary_tabular,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-17,auto_insurance_price,201,23,4,5,14,other PMLB,auxiliary_tabular,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-18,230_machine_cpu,209,6,0,0,6,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-19,561_cpu,209,7,0,0,7,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-20,712_chscase_geyser1,222,2,0,0,2,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-21,695_chatfield_4,235,12,0,0,12,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-22,first_principles_supernovae_zr,236,1,0,0,1,FirstPrinciples,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-23,first_principles_supernovae_zg,243,1,0,0,1,FirstPrinciples,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-24,579_fri_c0_250_5,250,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-25,596_fri_c2_250_5,250,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-26,601_fri_c1_250_5,250,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-27,613_fri_c3_250_5,250,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-28,602_fri_c3_250_10,250,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-29,615_fri_c4_250_10,250,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-30,635_fri_c0_250_10,250,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-31,647_fri_c1_250_10,250,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-32,657_fri_c2_250_10,250,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-33,605_fri_c2_250_25,250,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-34,644_fri_c4_250_25,250,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-35,653_fri_c0_250_25,250,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-36,658_fri_c3_250_25,250,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-37,603_fri_c0_250_50,250,50,0,0,50,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-38,648_fri_c1_250_50,250,50,0,0,50,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-39,560_bodyfat,252,14,0,0,14,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-40,690_visualizing_galaxy,323,4,0,0,4,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-41,nikuradse_2,362,1,0,0,1,Nikuradse,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-42,nikuradse_1,362,2,0,0,2,Nikuradse,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-43,519_vinnie,380,2,0,1,1,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-44,strogatz_bacres1,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-45,strogatz_bacres2,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-46,strogatz_barmag1,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-47,strogatz_barmag2,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-48,strogatz_glider1,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-49,strogatz_glider2,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-50,strogatz_lv1,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-51,strogatz_lv2,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-52,strogatz_predprey1,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-53,strogatz_predprey2,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-54,strogatz_shearflow1,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-55,strogatz_shearflow2,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-56,strogatz_vdp1,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-57,strogatz_vdp2,400,2,0,0,2,Strogatz,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-58,556_analcatdata_apnea2,475,3,0,2,1,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-59,557_analcatdata_apnea1,475,3,0,2,1,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-60,597_fri_c2_500_5,500,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-61,617_fri_c3_500_5,500,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-62,631_fri_c1_500_5,500,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-63,649_fri_c0_500_5,500,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-64,522_pm10,500,7,0,0,7,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-65,547_no2,500,7,0,0,7,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-66,604_fri_c4_500_10,500,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-67,627_fri_c2_500_10,500,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-68,641_fri_c1_500_10,500,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-69,646_fri_c3_500_10,500,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-70,654_fri_c0_500_10,500,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-71,581_fri_c3_500_25,500,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-72,582_fri_c1_500_25,500,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-73,584_fri_c4_500_25,500,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-74,633_fri_c0_500_25,500,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-75,643_fri_c2_500_25,500,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-76,616_fri_c4_500_50,500,50,0,0,50,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-77,626_fri_c2_500_50,500,50,0,0,50,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-78,637_fri_c1_500_50,500,50,0,0,50,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-79,645_fri_c3_500_50,500,50,0,0,50,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-80,650_fri_c0_500_50,500,50,0,0,50,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-81,666_rmftsa_ladata,508,10,0,0,10,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-82,1030_ERA,1000,4,0,0,4,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-83,599_fri_c2_1000_5,1000,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-84,609_fri_c0_1000_5,1000,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-85,612_fri_c1_1000_5,1000,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-86,628_fri_c3_1000_5,1000,5,0,0,5,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-87,593_fri_c1_1000_10,1000,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-88,595_fri_c0_1000_10,1000,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-89,606_fri_c2_1000_10,1000,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-90,608_fri_c3_1000_10,1000,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-91,623_fri_c4_1000_10,1000,10,0,0,10,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-92,586_fri_c3_1000_25,1000,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-93,589_fri_c2_1000_25,1000,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-94,592_fri_c4_1000_25,1000,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-95,598_fri_c0_1000_25,1000,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-96,620_fri_c1_1000_25,1000,25,0,0,25,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-97,583_fri_c1_1000_50,1000,50,0,0,50,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-98,590_fri_c0_1000_50,1000,50,0,0,50,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-99,607_fri_c4_1000_50,1000,50,0,0,50,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-100,618_fri_c3_1000_50,1000,50,0,0,50,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-101,622_fri_c2_1000_50,1000,50,0,0,50,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-102,588_fri_c4_1000_100,1000,100,0,0,100,FRI,mechanism_or_synthetic,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-103,4544_GeographicalOriginalofMusic,1059,117,0,0,117,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-104,529_pollen,3848,4,0,0,4,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-105,294_satellite_image,6435,36,0,0,36,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-106,503_wind,6574,14,0,0,14,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-107,225_puma8NH,8192,8,0,0,8,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-108,227_cpu_small,8192,12,0,0,12,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-109,562_cpu_small,8192,12,0,0,12,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-110,197_cpu_act,8192,21,0,0,21,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-111,573_cpu_act,8192,21,0,0,21,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-112,201_pol,15000,48,0,22,26,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-113,1199_BNG_echoMonths,17496,9,3,0,6,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-114,537_houses,20640,8,0,0,8,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-115,218_house_8L,22784,8,0,0,8,other PMLB,auxiliary_tabular,True,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-116,574_house_16H,22784,16,0,0,16,other PMLB,auxiliary_tabular,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-117,1193_BNG_lowbwt,31104,9,4,3,2,other PMLB,auxiliary_tabular,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-118,344_mv,40768,10,2,1,7,other PMLB,auxiliary_tabular,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-119,564_fried,40768,10,0,0,10,other PMLB,auxiliary_tabular,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-120,feynman_I_6_2a,100000,1,0,0,1,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-121,feynman_III_12_43,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-122,feynman_II_11_28,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-123,feynman_II_27_18,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-124,feynman_II_38_14,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-125,feynman_II_3_24,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-126,feynman_II_8_31,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-127,feynman_I_12_1,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-128,feynman_I_12_5,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-129,feynman_I_14_4,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-130,feynman_I_25_13,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-131,feynman_I_26_2,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-132,feynman_I_29_4,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-133,feynman_I_34_27,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-134,feynman_I_39_1,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-135,feynman_I_6_2,100000,2,0,0,2,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-136,feynman_III_15_12,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-137,feynman_III_15_14,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-138,feynman_III_15_27,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-139,feynman_III_17_37,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-140,feynman_III_7_38,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-141,feynman_III_8_54,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-142,feynman_II_10_9,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-143,feynman_II_13_23,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-144,feynman_II_13_34,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-145,feynman_II_15_4,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-146,feynman_II_15_5,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-147,feynman_II_24_17,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-148,feynman_II_27_16,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-149,feynman_II_34_2,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-150,feynman_II_34_29a,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-151,feynman_II_34_2a,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-152,feynman_II_37_1,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-153,feynman_II_4_23,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-154,feynman_II_8_7,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-155,feynman_I_10_7,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-156,feynman_I_12_4,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-157,feynman_I_14_3,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-158,feynman_I_15_10,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-159,feynman_I_16_6,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-160,feynman_I_18_12,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-161,feynman_I_27_6,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-162,feynman_I_30_3,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-163,feynman_I_30_5,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-164,feynman_I_34_1,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-165,feynman_I_34_14,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-166,feynman_I_37_4,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-167,feynman_I_39_11,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-168,feynman_I_43_31,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-169,feynman_I_47_23,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-170,feynman_I_48_2,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-171,feynman_I_6_2b,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-172,feynman_test_10,100000,3,0,0,3,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-173,feynman_III_10_19,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-174,feynman_III_13_18,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-175,feynman_III_21_20,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-176,feynman_III_4_32,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-177,feynman_III_4_33,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-178,feynman_II_11_27,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-179,feynman_II_13_17,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-180,feynman_II_34_11,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-181,feynman_II_38_3,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-182,feynman_II_6_11,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-183,feynman_II_6_15b,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-184,feynman_I_12_2,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-185,feynman_I_13_4,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-186,feynman_I_15_3t,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-187,feynman_I_15_3x,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-188,feynman_I_18_14,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-189,feynman_I_18_4,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-190,feynman_I_24_6,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-191,feynman_I_29_16,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-192,feynman_I_32_5,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-193,feynman_I_34_8,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-194,feynman_I_38_12,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-195,feynman_I_39_22,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-196,feynman_I_43_16,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-197,feynman_I_43_43,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-198,feynman_I_50_26,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-199,feynman_I_8_14,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-200,feynman_test_11,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-201,feynman_test_15,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-202,feynman_test_3,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-203,feynman_test_5,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-204,feynman_test_8,100000,4,0,0,4,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-205,feynman_III_14_14,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-206,feynman_III_19_51,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-207,feynman_II_11_20,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-208,feynman_II_11_3,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-209,feynman_II_21_32,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-210,feynman_II_2_42,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-211,feynman_II_34_29b,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-212,feynman_II_35_18,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-213,feynman_II_35_21,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-214,feynman_I_12_11,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-215,feynman_I_13_12,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-216,feynman_I_41_16,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-217,feynman_I_44_4,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-218,feynman_test_12,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-219,feynman_test_13,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-220,feynman_test_14,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-221,feynman_test_18,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-222,feynman_test_4,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-223,feynman_test_7,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-224,feynman_test_9,100000,5,0,0,5,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-225,feynman_III_9_52,100000,6,0,0,6,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-226,feynman_II_6_15a,100000,6,0,0,6,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-227,feynman_I_11_19,100000,6,0,0,6,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-228,feynman_I_32_17,100000,6,0,0,6,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-229,feynman_I_40_1,100000,6,0,0,6,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-230,feynman_test_16,100000,6,0,0,6,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-231,feynman_test_17,100000,6,0,0,6,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-232,feynman_test_19,100000,6,0,0,6,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-233,feynman_test_2,100000,6,0,0,6,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-234,feynman_test_1,100000,7,0,0,7,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-235,feynman_test_20,100000,7,0,0,7,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-236,feynman_test_6,100000,7,0,0,7,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-237,feynman_II_36_38,100000,8,0,0,8,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-238,feynman_I_9_18,100000,9,0,0,9,Feynman,mechanism_or_synthetic,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-239,1201_BNG_breastTumor,116640,9,4,3,2,other PMLB,auxiliary_tabular,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-240,1196_BNG_pharynx,1000000,10,3,6,1,other PMLB,auxiliary_tabular,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-241,1191_BNG_pbc,1000000,18,6,2,10,other PMLB,auxiliary_tabular,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
-242,1595_poker,1025010,10,0,5,5,other PMLB,auxiliary_tabular,False,False,"current PMLB regression task with n_instances>=80, n_continuous_features>=1, n_features<=120"
+dataset,n_instances,n_features,task_family,benchmark_role
+706_sleuth_case1202,93,6,other PMLB,auxiliary_tabular
+first_principles_planck,100,2,FirstPrinciples,mechanism_or_synthetic
+594_fri_c2_100_5,100,5,FRI,mechanism_or_synthetic
+611_fri_c3_100_5,100,5,FRI,mechanism_or_synthetic
+624_fri_c0_100_5,100,5,FRI,mechanism_or_synthetic
+656_fri_c1_100_5,100,5,FRI,mechanism_or_synthetic
+591_fri_c1_100_10,100,10,FRI,mechanism_or_synthetic
+621_fri_c0_100_10,100,10,FRI,mechanism_or_synthetic
+634_fri_c2_100_10,100,10,FRI,mechanism_or_synthetic
+651_fri_c0_100_25,100,25,FRI,mechanism_or_synthetic
+210_cloud,108,5,other PMLB,auxiliary_tabular
+678_visualizing_environmental,111,3,other PMLB,auxiliary_tabular
+663_rabe_266,120,2,other PMLB,auxiliary_tabular
+665_sleuth_case2002,147,6,other PMLB,auxiliary_tabular
+_deprecated_195_auto_price,159,15,other PMLB,auxiliary_tabular
+_deprecated_207_autoPrice,159,15,other PMLB,auxiliary_tabular
+auto_insurance_losses,164,24,other PMLB,auxiliary_tabular
+auto_insurance_price,201,23,other PMLB,auxiliary_tabular
+230_machine_cpu,209,6,other PMLB,auxiliary_tabular
+561_cpu,209,7,other PMLB,auxiliary_tabular
+712_chscase_geyser1,222,2,other PMLB,auxiliary_tabular
+695_chatfield_4,235,12,other PMLB,auxiliary_tabular
+first_principles_supernovae_zr,236,1,FirstPrinciples,mechanism_or_synthetic
+first_principles_supernovae_zg,243,1,FirstPrinciples,mechanism_or_synthetic
+579_fri_c0_250_5,250,5,FRI,mechanism_or_synthetic
+596_fri_c2_250_5,250,5,FRI,mechanism_or_synthetic
+601_fri_c1_250_5,250,5,FRI,mechanism_or_synthetic
+613_fri_c3_250_5,250,5,FRI,mechanism_or_synthetic
+602_fri_c3_250_10,250,10,FRI,mechanism_or_synthetic
+615_fri_c4_250_10,250,10,FRI,mechanism_or_synthetic
+635_fri_c0_250_10,250,10,FRI,mechanism_or_synthetic
+647_fri_c1_250_10,250,10,FRI,mechanism_or_synthetic
+657_fri_c2_250_10,250,10,FRI,mechanism_or_synthetic
+605_fri_c2_250_25,250,25,FRI,mechanism_or_synthetic
+644_fri_c4_250_25,250,25,FRI,mechanism_or_synthetic
+653_fri_c0_250_25,250,25,FRI,mechanism_or_synthetic
+658_fri_c3_250_25,250,25,FRI,mechanism_or_synthetic
+603_fri_c0_250_50,250,50,FRI,mechanism_or_synthetic
+648_fri_c1_250_50,250,50,FRI,mechanism_or_synthetic
+560_bodyfat,252,14,other PMLB,auxiliary_tabular
+690_visualizing_galaxy,323,4,other PMLB,auxiliary_tabular
+nikuradse_2,362,1,Nikuradse,mechanism_or_synthetic
+nikuradse_1,362,2,Nikuradse,mechanism_or_synthetic
+519_vinnie,380,2,other PMLB,auxiliary_tabular
+strogatz_bacres1,400,2,Strogatz,mechanism_or_synthetic
+strogatz_bacres2,400,2,Strogatz,mechanism_or_synthetic
+strogatz_barmag1,400,2,Strogatz,mechanism_or_synthetic
+strogatz_barmag2,400,2,Strogatz,mechanism_or_synthetic
+strogatz_glider1,400,2,Strogatz,mechanism_or_synthetic
+strogatz_glider2,400,2,Strogatz,mechanism_or_synthetic
+strogatz_lv1,400,2,Strogatz,mechanism_or_synthetic
+strogatz_lv2,400,2,Strogatz,mechanism_or_synthetic
+strogatz_predprey1,400,2,Strogatz,mechanism_or_synthetic
+strogatz_predprey2,400,2,Strogatz,mechanism_or_synthetic
+strogatz_shearflow1,400,2,Strogatz,mechanism_or_synthetic
+strogatz_shearflow2,400,2,Strogatz,mechanism_or_synthetic
+strogatz_vdp1,400,2,Strogatz,mechanism_or_synthetic
+strogatz_vdp2,400,2,Strogatz,mechanism_or_synthetic
+556_analcatdata_apnea2,475,3,other PMLB,auxiliary_tabular
+557_analcatdata_apnea1,475,3,other PMLB,auxiliary_tabular
+597_fri_c2_500_5,500,5,FRI,mechanism_or_synthetic
+617_fri_c3_500_5,500,5,FRI,mechanism_or_synthetic
+631_fri_c1_500_5,500,5,FRI,mechanism_or_synthetic
+649_fri_c0_500_5,500,5,FRI,mechanism_or_synthetic
+522_pm10,500,7,other PMLB,auxiliary_tabular
+547_no2,500,7,other PMLB,auxiliary_tabular
+604_fri_c4_500_10,500,10,FRI,mechanism_or_synthetic
+627_fri_c2_500_10,500,10,FRI,mechanism_or_synthetic
+641_fri_c1_500_10,500,10,FRI,mechanism_or_synthetic
+646_fri_c3_500_10,500,10,FRI,mechanism_or_synthetic
+654_fri_c0_500_10,500,10,FRI,mechanism_or_synthetic
+581_fri_c3_500_25,500,25,FRI,mechanism_or_synthetic
+582_fri_c1_500_25,500,25,FRI,mechanism_or_synthetic
+584_fri_c4_500_25,500,25,FRI,mechanism_or_synthetic
+633_fri_c0_500_25,500,25,FRI,mechanism_or_synthetic
+643_fri_c2_500_25,500,25,FRI,mechanism_or_synthetic
+616_fri_c4_500_50,500,50,FRI,mechanism_or_synthetic
+626_fri_c2_500_50,500,50,FRI,mechanism_or_synthetic
+637_fri_c1_500_50,500,50,FRI,mechanism_or_synthetic
+645_fri_c3_500_50,500,50,FRI,mechanism_or_synthetic
+650_fri_c0_500_50,500,50,FRI,mechanism_or_synthetic
+666_rmftsa_ladata,508,10,other PMLB,auxiliary_tabular
+1030_ERA,1000,4,other PMLB,auxiliary_tabular
+599_fri_c2_1000_5,1000,5,FRI,mechanism_or_synthetic
+609_fri_c0_1000_5,1000,5,FRI,mechanism_or_synthetic
+612_fri_c1_1000_5,1000,5,FRI,mechanism_or_synthetic
+628_fri_c3_1000_5,1000,5,FRI,mechanism_or_synthetic
+593_fri_c1_1000_10,1000,10,FRI,mechanism_or_synthetic
+595_fri_c0_1000_10,1000,10,FRI,mechanism_or_synthetic
+606_fri_c2_1000_10,1000,10,FRI,mechanism_or_synthetic
+608_fri_c3_1000_10,1000,10,FRI,mechanism_or_synthetic
+623_fri_c4_1000_10,1000,10,FRI,mechanism_or_synthetic
+586_fri_c3_1000_25,1000,25,FRI,mechanism_or_synthetic
+589_fri_c2_1000_25,1000,25,FRI,mechanism_or_synthetic
+592_fri_c4_1000_25,1000,25,FRI,mechanism_or_synthetic
+598_fri_c0_1000_25,1000,25,FRI,mechanism_or_synthetic
+620_fri_c1_1000_25,1000,25,FRI,mechanism_or_synthetic
+583_fri_c1_1000_50,1000,50,FRI,mechanism_or_synthetic
+590_fri_c0_1000_50,1000,50,FRI,mechanism_or_synthetic
+607_fri_c4_1000_50,1000,50,FRI,mechanism_or_synthetic
+618_fri_c3_1000_50,1000,50,FRI,mechanism_or_synthetic
+622_fri_c2_1000_50,1000,50,FRI,mechanism_or_synthetic
+588_fri_c4_1000_100,1000,100,FRI,mechanism_or_synthetic
+4544_GeographicalOriginalofMusic,1059,117,other PMLB,auxiliary_tabular
+529_pollen,3848,4,other PMLB,auxiliary_tabular
+294_satellite_image,6435,36,other PMLB,auxiliary_tabular
+503_wind,6574,14,other PMLB,auxiliary_tabular
+225_puma8NH,8192,8,other PMLB,auxiliary_tabular
+227_cpu_small,8192,12,other PMLB,auxiliary_tabular
+562_cpu_small,8192,12,other PMLB,auxiliary_tabular
+197_cpu_act,8192,21,other PMLB,auxiliary_tabular
+573_cpu_act,8192,21,other PMLB,auxiliary_tabular
+201_pol,15000,48,other PMLB,auxiliary_tabular
+1199_BNG_echoMonths,17496,9,other PMLB,auxiliary_tabular
+537_houses,20640,8,other PMLB,auxiliary_tabular
+218_house_8L,22784,8,other PMLB,auxiliary_tabular
+574_house_16H,22784,16,other PMLB,auxiliary_tabular
+1193_BNG_lowbwt,31104,9,other PMLB,auxiliary_tabular
+344_mv,40768,10,other PMLB,auxiliary_tabular
+564_fried,40768,10,other PMLB,auxiliary_tabular
+feynman_I_6_2a,100000,1,Feynman,mechanism_or_synthetic
+feynman_III_12_43,100000,2,Feynman,mechanism_or_synthetic
+feynman_II_11_28,100000,2,Feynman,mechanism_or_synthetic
+feynman_II_27_18,100000,2,Feynman,mechanism_or_synthetic
+feynman_II_38_14,100000,2,Feynman,mechanism_or_synthetic
+feynman_II_3_24,100000,2,Feynman,mechanism_or_synthetic
+feynman_II_8_31,100000,2,Feynman,mechanism_or_synthetic
+feynman_I_12_1,100000,2,Feynman,mechanism_or_synthetic
+feynman_I_12_5,100000,2,Feynman,mechanism_or_synthetic
+feynman_I_14_4,100000,2,Feynman,mechanism_or_synthetic
+feynman_I_25_13,100000,2,Feynman,mechanism_or_synthetic
+feynman_I_26_2,100000,2,Feynman,mechanism_or_synthetic
+feynman_I_29_4,100000,2,Feynman,mechanism_or_synthetic
+feynman_I_34_27,100000,2,Feynman,mechanism_or_synthetic
+feynman_I_39_1,100000,2,Feynman,mechanism_or_synthetic
+feynman_I_6_2,100000,2,Feynman,mechanism_or_synthetic
+feynman_III_15_12,100000,3,Feynman,mechanism_or_synthetic
+feynman_III_15_14,100000,3,Feynman,mechanism_or_synthetic
+feynman_III_15_27,100000,3,Feynman,mechanism_or_synthetic
+feynman_III_17_37,100000,3,Feynman,mechanism_or_synthetic
+feynman_III_7_38,100000,3,Feynman,mechanism_or_synthetic
+feynman_III_8_54,100000,3,Feynman,mechanism_or_synthetic
+feynman_II_10_9,100000,3,Feynman,mechanism_or_synthetic
+feynman_II_13_23,100000,3,Feynman,mechanism_or_synthetic
+feynman_II_13_34,100000,3,Feynman,mechanism_or_synthetic
+feynman_II_15_4,100000,3,Feynman,mechanism_or_synthetic
+feynman_II_15_5,100000,3,Feynman,mechanism_or_synthetic
+feynman_II_24_17,100000,3,Feynman,mechanism_or_synthetic
+feynman_II_27_16,100000,3,Feynman,mechanism_or_synthetic
+feynman_II_34_2,100000,3,Feynman,mechanism_or_synthetic
+feynman_II_34_29a,100000,3,Feynman,mechanism_or_synthetic
+feynman_II_34_2a,100000,3,Feynman,mechanism_or_synthetic
+feynman_II_37_1,100000,3,Feynman,mechanism_or_synthetic
+feynman_II_4_23,100000,3,Feynman,mechanism_or_synthetic
+feynman_II_8_7,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_10_7,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_12_4,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_14_3,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_15_10,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_16_6,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_18_12,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_27_6,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_30_3,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_30_5,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_34_1,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_34_14,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_37_4,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_39_11,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_43_31,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_47_23,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_48_2,100000,3,Feynman,mechanism_or_synthetic
+feynman_I_6_2b,100000,3,Feynman,mechanism_or_synthetic
+feynman_test_10,100000,3,Feynman,mechanism_or_synthetic
+feynman_III_10_19,100000,4,Feynman,mechanism_or_synthetic
+feynman_III_13_18,100000,4,Feynman,mechanism_or_synthetic
+feynman_III_21_20,100000,4,Feynman,mechanism_or_synthetic
+feynman_III_4_32,100000,4,Feynman,mechanism_or_synthetic
+feynman_III_4_33,100000,4,Feynman,mechanism_or_synthetic
+feynman_II_11_27,100000,4,Feynman,mechanism_or_synthetic
+feynman_II_13_17,100000,4,Feynman,mechanism_or_synthetic
+feynman_II_34_11,100000,4,Feynman,mechanism_or_synthetic
+feynman_II_38_3,100000,4,Feynman,mechanism_or_synthetic
+feynman_II_6_11,100000,4,Feynman,mechanism_or_synthetic
+feynman_II_6_15b,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_12_2,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_13_4,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_15_3t,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_15_3x,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_18_14,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_18_4,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_24_6,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_29_16,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_32_5,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_34_8,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_38_12,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_39_22,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_43_16,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_43_43,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_50_26,100000,4,Feynman,mechanism_or_synthetic
+feynman_I_8_14,100000,4,Feynman,mechanism_or_synthetic
+feynman_test_11,100000,4,Feynman,mechanism_or_synthetic
+feynman_test_15,100000,4,Feynman,mechanism_or_synthetic
+feynman_test_3,100000,4,Feynman,mechanism_or_synthetic
+feynman_test_5,100000,4,Feynman,mechanism_or_synthetic
+feynman_test_8,100000,4,Feynman,mechanism_or_synthetic
+feynman_III_14_14,100000,5,Feynman,mechanism_or_synthetic
+feynman_III_19_51,100000,5,Feynman,mechanism_or_synthetic
+feynman_II_11_20,100000,5,Feynman,mechanism_or_synthetic
+feynman_II_11_3,100000,5,Feynman,mechanism_or_synthetic
+feynman_II_21_32,100000,5,Feynman,mechanism_or_synthetic
+feynman_II_2_42,100000,5,Feynman,mechanism_or_synthetic
+feynman_II_34_29b,100000,5,Feynman,mechanism_or_synthetic
+feynman_II_35_18,100000,5,Feynman,mechanism_or_synthetic
+feynman_II_35_21,100000,5,Feynman,mechanism_or_synthetic
+feynman_I_12_11,100000,5,Feynman,mechanism_or_synthetic
+feynman_I_13_12,100000,5,Feynman,mechanism_or_synthetic
+feynman_I_41_16,100000,5,Feynman,mechanism_or_synthetic
+feynman_I_44_4,100000,5,Feynman,mechanism_or_synthetic
+feynman_test_12,100000,5,Feynman,mechanism_or_synthetic
+feynman_test_13,100000,5,Feynman,mechanism_or_synthetic
+feynman_test_14,100000,5,Feynman,mechanism_or_synthetic
+feynman_test_18,100000,5,Feynman,mechanism_or_synthetic
+feynman_test_4,100000,5,Feynman,mechanism_or_synthetic
+feynman_test_7,100000,5,Feynman,mechanism_or_synthetic
+feynman_test_9,100000,5,Feynman,mechanism_or_synthetic
+feynman_III_9_52,100000,6,Feynman,mechanism_or_synthetic
+feynman_II_6_15a,100000,6,Feynman,mechanism_or_synthetic
+feynman_I_11_19,100000,6,Feynman,mechanism_or_synthetic
+feynman_I_32_17,100000,6,Feynman,mechanism_or_synthetic
+feynman_I_40_1,100000,6,Feynman,mechanism_or_synthetic
+feynman_test_16,100000,6,Feynman,mechanism_or_synthetic
+feynman_test_17,100000,6,Feynman,mechanism_or_synthetic
+feynman_test_19,100000,6,Feynman,mechanism_or_synthetic
+feynman_test_2,100000,6,Feynman,mechanism_or_synthetic
+feynman_test_1,100000,7,Feynman,mechanism_or_synthetic
+feynman_test_20,100000,7,Feynman,mechanism_or_synthetic
+feynman_test_6,100000,7,Feynman,mechanism_or_synthetic
+feynman_II_36_38,100000,8,Feynman,mechanism_or_synthetic
+feynman_I_9_18,100000,9,Feynman,mechanism_or_synthetic
+1201_BNG_breastTumor,116640,9,other PMLB,auxiliary_tabular
+1196_BNG_pharynx,1000000,10,other PMLB,auxiliary_tabular
+1191_BNG_pbc,1000000,18,other PMLB,auxiliary_tabular
+1595_poker,1025010,10,other PMLB,auxiliary_tabular

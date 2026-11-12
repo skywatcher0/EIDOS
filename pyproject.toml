@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eidos-toolkit"
+version = "0.2.0"
+description = "Symbolic regression with isolated evidence, quantized model records and prediction intervals"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "numpy>=2.4,<3",
+  "pandas>=3.0,<4",
+  "scipy>=1.17,<2",
+  "scikit-learn>=1.8,<2",
+  "threadpoolctl>=3.6,<4",
+]
+
+[project.optional-dependencies]
+benchmarks = ["certifi>=2026.2"]
+
+[project.scripts]
+eidos = "eidos.cli:main"
+
+[project.urls]
+Repository = "https://github.com/skywatcher0/EIDOS"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["eidos*"]
+
+[tool.setuptools.package-data]
+eidos = ["defaults.json"]

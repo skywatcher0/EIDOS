@@ -1,6 +1,0 @@
-generator,arm,method,seed,nominal,observed_coverage,mean_interval_length,n_cal,n_test,selected_candidate_id,guarantee_scope,unseen_group_fallback,shift_heldout_env,failed
-feynman_like_blackbody_proxy,exchangeable,mondrian,20260225,0.9,0.9368421052631579,18.204214920889477,285,285,struct_hybrid_rbf_ratio,mondrian_exchangeable,none,,False
-feynman_like_blackbody_proxy,exchangeable,split,20260225,0.9,0.9087719298245615,17.003746548151373,285,285,struct_hybrid_rbf_ratio,iid_exchangeable_only,none,,False
-feynman_like_blackbody_proxy,shifted,mondrian,20260225,0.9,0.8421052631578947,19.27711740957497,252,380,struct_hybrid_rbf_ratio,mondrian_empirical_shift_diagnostic,nearest,4.0,False
-feynman_like_blackbody_proxy,shifted,proxy_trend,20260225,0.9,0.9710526315789474,41.769939808603404,252,380,struct_hybrid_rbf_ratio,source_only_proxy_trend_diagnostic,none,4.0,False
-feynman_like_blackbody_proxy,shifted,split,20260225,0.9,0.7973684210526316,16.082854107134295,252,380,struct_hybrid_rbf_ratio,empirical_shift_diagnostic,none,4.0,False

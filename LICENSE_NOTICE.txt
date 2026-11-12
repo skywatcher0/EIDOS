@@ -1,10 +1,7 @@
-The supplied EIDOS project did not declare a software licence. This archive
-does not invent or change the authors' licensing terms.
+No software licence has been specified for the EIDOS source code.
+This distribution does not change the copyright holders' licensing terms.
 
-Public datasets retain their original rights and attribution. PMLB source
-URLs and archived checksums are in data/pmlb/manifest.json; OpenML dataset IDs,
-source URLs, target columns and preprocessing are in data/openml/. Original
-dataset metadata and the upstream PMLB licence are retained where available.
-
-The included paper text is supplied only as the provenance for this requested
-reproduction package. It is not a new manuscript release.
+Bundled datasets retain their upstream licences and attribution. PMLB source
+links and checksums are in data/pmlb/manifest.json and its upstream licence
+is in data/pmlb/UPSTREAM_LICENSE.txt. OpenML source identifiers, licences,
+targets and processing metadata are in data/openml/sources.json.

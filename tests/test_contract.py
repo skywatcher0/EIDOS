@@ -1,11 +1,11 @@
 import unittest
 import numpy as np
-from src.eidos.protocol.strict import five_role_split_by_env
-from src.eidos.mdl.data_code import UniformQuantizer, bin_prob_mass
-from src.eidos.dsl.grammar import Const, Var
-from src.eidos.search.models import CandidateSpec, LinearBasisModel
-from repro.records import pack, unpack
-from repro.common import canonical_bytes
+from eidos.protocol.strict import five_role_split_by_env
+from eidos.mdl.data_code import UniformQuantizer, bin_prob_mass
+from eidos.dsl.grammar import Const, Var
+from eidos.search.models import CandidateSpec, LinearBasisModel
+from eidos.serialization import pack, unpack
+from eidos._io import canonical_bytes
 
 class ContractTests(unittest.TestCase):
     def test_roles_cover_once_and_are_deterministic(self):

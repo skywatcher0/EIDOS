@@ -2,7 +2,7 @@
 import argparse
 import json
 from pathlib import Path
-from repro.reporting import report, SPECS
+from benchmarks.reporting import report, SPECS
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)

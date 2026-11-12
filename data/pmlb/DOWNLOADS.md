@@ -1,6 +1,6 @@
 # PMLB full source downloads
 
-The compact archive bundles all 243 exact experimental samples. Full source tables are available below and can be reconstructed with `prepare_data.py`.
+All 243 fixed modeling inputs are bundled under `samples/`. Optional full source tables are available below and can be processed with `prepare_data.py`.
 
 ```sh
 python prepare_data.py --track pmlb --download-missing --output rebuilt_data

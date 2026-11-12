@@ -7,8 +7,8 @@ from typing import Iterable, Mapping
 
 import numpy as np
 
-from src.eidos.dsl.domain_safety import safe_eval
-from src.eidos.dsl.grammar import Expr
+from eidos.dsl.domain_safety import safe_eval
+from eidos.dsl.grammar import Expr
 
 
 @dataclass

@@ -4,7 +4,7 @@ from collections import Counter
 from dataclasses import dataclass
 from math import ceil, floor, log2
 
-from src.eidos.dsl.grammar import ALL_OPS, Expr
+from eidos.dsl.grammar import ALL_OPS, Expr
 
 
 STRICT_OP_ALPHABET = tuple(sorted(ALL_OPS))
@@ -84,7 +84,7 @@ def grammar_extension_code_bits(concepts: list[Expr]) -> float:
 def grammar_code_bits(new_concepts: int, concept_cost: float = 24.0) -> float:
     """Legacy bookkeeping penalty retained for archived experiment replay.
 
-    It is intentionally not described as a code in the revised manuscript.
+    This diagnostic cost is not a prefix code.
     New strict analyses must pass definitions to ``grammar_extension_code_bits``.
     """
 

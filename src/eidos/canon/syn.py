@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from src.eidos.dsl.grammar import Const, Expr
+from eidos.dsl.grammar import Const, Expr
 
 
 COMMUTATIVE = {"add", "mul"}

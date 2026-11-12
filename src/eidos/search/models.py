@@ -8,8 +8,8 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.stats import t
 
-from src.eidos.dsl.domain_safety import safe_eval
-from src.eidos.dsl.grammar import Const, Expr, Var, op1, op2, op3
+from eidos.dsl.domain_safety import safe_eval
+from eidos.dsl.grammar import Const, Expr, Var, op1, op2, op3
 
 
 def _softplus(x: np.ndarray) -> np.ndarray:

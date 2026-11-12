@@ -1,6 +1,8 @@
+.git
 .venv
-__pycache__
 **/__pycache__
+**/*.egg-info
+build
+dist
 results*
 rebuilt_data
-validation
